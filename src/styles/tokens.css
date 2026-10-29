@@ -169,6 +169,14 @@
   --g-h2: #d1d1d6;
   --g-c1x: #d1d1d6;
   --g-c2x: #48484a;
+  --team-1: #ffffff;
+  --team-2: #8e8e93;
+  --team-3: #48484a;
+  --team-4: #d1d1d6;
+  --team-5: #636366;
+  --team-6: #2c2c2e;
+  --team-7: #aeaeb2;
+  --team-8: #f2f2f7;
 }
 
 /* ───────── Açık ───────── */
@@ -275,6 +283,14 @@
   --g-h2: #1d1d1f;
   --g-c1x: #f5f7fb;
   --g-c2x: #1d1d1f;
+  --team-1: #0a84ff;
+  --team-2: #8e9bb0;
+  --team-3: #1c3d6e;
+  --team-4: #5ac8fa;
+  --team-5: #c7d3e6;
+  --team-6: #3a5a8c;
+  --team-7: #6f86a8;
+  --team-8: #a9c8f5;
 }
 
 /* ───────── Özel: Claude'un sıcak koyu paleti ───────── */
@@ -381,6 +397,14 @@
   --g-h2: #ece6d6;
   --g-c1x: #faf9f5;
   --g-c2x: #3b3a36;
+  --team-1: #c6613f;
+  --team-2: #8a6a4a;
+  --team-3: #e8a98b;
+  --team-4: #5e4a3d;
+  --team-5: #d97757;
+  --team-6: #a8927e;
+  --team-7: #7a3b24;
+  --team-8: #e8d2bf;
 }
 
 /* Açık temada durum çubuğu yazısı beyaz kalır (iOS "black-translucent"); üstte ince koyu şerit okunurluğu korur. */

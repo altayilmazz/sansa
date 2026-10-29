@@ -15,7 +15,7 @@ import { useExample } from '../ui/ExampleBanner'
 import { StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
-const TEAM_TINTS = ['#ff6b5e', '#4ea8ff', '#30d158', '#ffd60a', '#ff9f0a', '#bf8cff', '#f4f1ea', '#98989d']
+const TEAM_TINTS = Array.from({ length: 8 }, (_, i) => `var(--team-${i + 1})`)
 
 const isNum = (v: unknown): v is number => typeof v === 'number'
 
