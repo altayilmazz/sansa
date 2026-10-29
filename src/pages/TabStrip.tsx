@@ -138,6 +138,15 @@ export function TabStrip({ selected, ring, setRing, render }: { selected: ToolId
         if (suppress.current) {
           e.preventDefault()
           e.stopPropagation()
+          return
+        }
+        // Süren bir kayma sırasında dokunulursa görünen düzen halkaya yazılır; yoksa
+        // seçilen araç görünmeyen bir halka konumuna denk gelip en sağa atlar.
+        const cur = offset.get()
+        if (cur !== 0) {
+          token.current++
+          anim.current?.stop()
+          commit(mod(Math.round(cur), count))
         }
       }}
     >
