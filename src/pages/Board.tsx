@@ -7,12 +7,15 @@ import { href } from '../state/router'
 import { TOOL_ORDER, TOOLS, type ToolId } from '../state/tools'
 import { TeamsTool } from '../tools/TeamsTool'
 import { Icon } from '../ui/Icon'
+import { SLOTS, TabStrip, useRing } from './TabStrip'
 import { ToolHostContext } from '../ui/ToolHost'
 
 const WheelTool = lazy(() => import('../tools/WheelTool').then((m) => ({ default: m.WheelTool })))
 const DrawTool = lazy(() => import('../tools/DrawTool').then((m) => ({ default: m.DrawTool })))
 const CoinTool = lazy(() => import('../tools/CoinTool').then((m) => ({ default: m.CoinTool })))
 const DiceTool = lazy(() => import('../tools/DiceTool').then((m) => ({ default: m.DiceTool })))
+const MinesTool = lazy(() => import('../tools/MinesTool').then((m) => ({ default: m.MinesTool })))
+const NumberTool = lazy(() => import('../tools/NumberTool').then((m) => ({ default: m.NumberTool })))
 const CardTool = lazy(() => import('../tools/CardTool').then((m) => ({ default: m.CardTool })))
 
 function ToolView({ tool }: { tool: ToolId }) {
@@ -29,6 +32,10 @@ function ToolView({ tool }: { tool: ToolId }) {
       return <DiceTool />
     case 'kart':
       return <CardTool />
+    case 'mayin':
+      return <MinesTool />
+    case 'sayi':
+      return <NumberTool />
   }
 }
 
@@ -98,6 +105,7 @@ export function Board({ selected }: { selected: ToolId | null }) {
   // Örnek yüklenince aracı baştan kurmak için artan sayaç
   const [nonce, setNonce] = useState(0)
   const open = selected !== null
+  const { ring, setRing, pin } = useRing(selected)
   // İlk çizimde (doğrudan bağlantıyla açılışta) giriş animasyonu oynatılmaz.
   const first = useRef(true)
   useEffect(() => {
@@ -174,45 +182,24 @@ export function Board({ selected }: { selected: ToolId | null }) {
     )
   }
 
-  /* ───────── Dar ekran: altta sekme şeridi + sekmeden yukarı büyüyen panel ───────── */
-  const idx = selected ? TOOL_ORDER.indexOf(selected) : -1
-  const n = TOOL_ORDER.length
-  // Panel, seçili sekmenin yatay aralığından başlayıp tüm genişliğe açılır.
-  const left = (idx / n) * 100
-  const right = ((n - 1 - idx) / n) * 100
+  /* ───────── Dar ekran: altta kayan sekme şeridi + seçili sekmeden yukarı büyüyen panel ───────── */
+  // Panel, seçili sekmenin yuvasından başlayıp tüm genişliğe açılır.
+  const left = (pin / SLOTS) * 100
+  const right = ((SLOTS - 1 - pin) / SLOTS) * 100
 
   return (
     <ToolHostContext.Provider value={host}>
       <div className={`board${open ? ' is-open' : ''}`}>
         <h1 className="sr-only">Şansa</h1>
         <div className="board__grid">
-          {TOOL_ORDER.map((id) => {
-            const sel = id === selected
-            return (
-              <motion.section
-                key={id}
-                layout={!reduced}
-                transition={{ layout: layoutTransition }}
-                style={
-                  {
-                    ...(open ? radii(sel ? 0 : 16, sel ? 0 : 16, 16, 16) : radii(24, 24, 24, 24)),
-                    '--tint': TOOLS[id].tint,
-                  } as CSSProperties
-                }
-                className={`block block--tile${sel ? ' is-selected' : ''}`}
-              >
-                <motion.div
-                  // Düzen değişirken yüz bir an gizlenir; yeni düzende yumuşakça belirir.
-                  key={open ? 'strip' : 'home'}
-                  className="block__tile"
-                  initial={first.current ? false : { opacity: 0 }}
-                  animate={{ opacity: 1, transition: { delay: reduced ? 0 : 0.2, duration: 0.2 } }}
-                >
-                  <TileFace id={id} selected={sel} />
-                </motion.div>
-              </motion.section>
-            )
-          })}
+          {!open &&
+            TOOL_ORDER.map((id) => (
+              <section key={id} className="block block--tile" style={{ ...radii(24, 24, 24, 24), '--tint': TOOLS[id].tint } as CSSProperties}>
+                <div className="block__tile">
+                  <TileFace id={id} />
+                </div>
+              </section>
+            ))}
 
           <AnimatePresence mode="popLayout" initial={false}>
             {selected && (
@@ -220,7 +207,7 @@ export function Board({ selected }: { selected: ToolId | null }) {
                 key={selected}
                 className="block block--panel"
                 aria-label={TOOLS[selected].name}
-                style={radii(24, 24, idx === n - 1 ? 0 : 24, idx === 0 ? 0 : 24)}
+                style={radii(24, 24, pin === SLOTS - 1 ? 0 : 24, pin === 0 ? 0 : 24)}
                 initial={reduced ? { opacity: 0 } : { clipPath: `inset(100% ${right}% 0% ${left}% round 0px)` }}
                 animate={reduced ? { opacity: 1 } : { clipPath: 'inset(0% 0% 0% 0% round 0px)' }}
                 exit={{ opacity: 0, transition: { duration: 0.12 } }}
@@ -236,6 +223,24 @@ export function Board({ selected }: { selected: ToolId | null }) {
               </motion.section>
             )}
           </AnimatePresence>
+
+          {selected && (
+            <TabStrip
+              selected={selected}
+              ring={ring}
+              setRing={setRing}
+              render={(id, pinned) => (
+                <section
+                  className={`block block--tile${pinned ? ' is-selected' : ''}`}
+                  style={{ ...radii(pinned ? 0 : 16, pinned ? 0 : 16, 16, 16), '--tint': TOOLS[id].tint } as CSSProperties}
+                >
+                  <div className="block__tile">
+                    <TileFace id={id} selected={pinned} />
+                  </div>
+                </section>
+              )}
+            />
+          )}
         </div>
       </div>
     </ToolHostContext.Provider>

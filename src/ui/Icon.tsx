@@ -73,6 +73,7 @@ const paths = {
       <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" />
     </>
   ),
+  flag: <path d="M6 21V4M6 5h11l-2.5 4 2.5 4H6" />,
   undo: <path d="M9 14L4 9l5-5M4 9h10a6 6 0 010 12h-3" />,
 } as const
 

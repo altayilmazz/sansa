@@ -11,6 +11,8 @@
   --tint-para: #e3b341;
   --tint-zar: #ff453a;
   --tint-kart: #7d7aff;
+  --tint-mayin: #ff6b6b;
+  --tint-sayi: #5ac8fa;
 
   /* Tipografi */
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter Variable', 'Segoe UI Variable', system-ui, sans-serif;
@@ -54,6 +56,8 @@
   --tint-para: #d1d1d6;
   --tint-zar: #d1d1d6;
   --tint-kart: #d1d1d6;
+  --tint-mayin: #d1d1d6;
+  --tint-sayi: #d1d1d6;
 
   --bg: #000000;
   --surface: #1d1d1f;
@@ -141,6 +145,10 @@
   --g-r2: #d1d1d6;
   --g-r3: #48484a;
   --g-ln: none;
+  --g-m1: #d1d1d6;
+  --g-m2: #48484a;
+  --g-s1: #3a3a3c;
+  --g-s2: #d1d1d6;
 }
 
 /* ───────── Açık ───────── */
@@ -233,6 +241,10 @@
   --g-r2: #f5f7fb;
   --g-r3: #2563eb;
   --g-ln: rgba(29,29,31,0.22);
+  --g-m1: #1d1d1f;
+  --g-m2: #2563eb;
+  --g-s1: #2563eb;
+  --g-s2: #ffffff;
 }
 
 /* ───────── Özel: Claude'un sıcak koyu paleti ───────── */
@@ -325,6 +337,10 @@
   --g-r2: #faf9f5;
   --g-r3: #d97757;
   --g-ln: none;
+  --g-m1: #ece6d6;
+  --g-m2: #d97757;
+  --g-s1: #d97757;
+  --g-s2: #faf9f5;
 }
 
 /* Açık temada durum çubuğu yazısı beyaz kalır (iOS "black-translucent"); üstte ince koyu şerit okunurluğu korur. */

@@ -1,4 +1,4 @@
-export type ToolId = 'takim' | 'cark' | 'kura' | 'para' | 'zar' | 'kart'
+export type ToolId = 'takim' | 'cark' | 'kura' | 'para' | 'zar' | 'kart' | 'mayin' | 'sayi'
 
 export interface ToolMeta {
   id: ToolId
@@ -18,8 +18,10 @@ export const TOOLS: Record<ToolId, ToolMeta> = {
   para: { id: 'para', name: 'Yazı tura', short: 'Yazı tura', blurb: 'Tek atış ya da iki kişilik karşılaşma.', tint: 'var(--tint-para)' },
   zar: { id: 'zar', name: 'Zar at', short: 'Zar', blurb: 'Bir ya da iki zar; yüksek toplam kazanır.', tint: 'var(--tint-zar)' },
   kart: { id: 'kart', name: 'Kart çek', short: 'Kart', blurb: '52 kartlık deste; yüksek kart kazanır.', tint: 'var(--tint-kart)' },
+  mayin: { id: 'mayin', name: 'Mayın tarlası', short: 'Mayın', blurb: 'Mayınlara basmadan tarlayı temizle.', tint: 'var(--tint-mayin)' },
+  sayi: { id: 'sayi', name: 'Rastgele sayı', short: 'Sayı', blurb: 'İstediğin aralıkta rastgele sayılar üret.', tint: 'var(--tint-sayi)' },
 }
 
-export const TOOL_ORDER: ToolId[] = ['takim', 'cark', 'kura', 'para', 'zar', 'kart']
+export const TOOL_ORDER: ToolId[] = ['takim', 'cark', 'kura', 'para', 'zar', 'kart', 'mayin', 'sayi']
 
 export const isToolId = (v: unknown): v is ToolId => typeof v === 'string' && v in TOOLS

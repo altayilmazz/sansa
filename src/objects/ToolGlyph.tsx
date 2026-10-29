@@ -74,6 +74,24 @@ export function ToolGlyph({ tool, size = 28 }: { tool: ToolId; size?: number }) 
           <path d="M20.4 20.6s-4-2.5-5-4.9c-.9-2 .3-4.1 2.3-4.1 1.2 0 2 .7 2.7 1.7.8-1 1.6-1.7 2.8-1.7 2 0 3.2 2.1 2.3 4.1-1.1 2.4-5.1 4.9-5.1 4.9z" style={f('r3')} transform="rotate(8 20 15)" />
         </g>
       )}
+      {tool === 'mayin' && (
+        <g>
+          <circle cx="16" cy="17" r="8" style={f('m1')} />
+          {[0, 45, 90, 135].map((a) => (
+            <rect key={a} x="14.6" y="4" width="2.8" height="26" rx="1.4" style={f('m1')} transform={`rotate(${a} 16 17)`} />
+          ))}
+          <circle cx="13" cy="14" r="2.2" style={{ fill: 'var(--g-m2)' }} />
+          <path d="M20 5.5c1.8-1.4 3.6-1.4 5-.2" fill="none" style={{ stroke: 'var(--g-m2)' }} strokeWidth="2" strokeLinecap="round" />
+        </g>
+      )}
+      {tool === 'sayi' && (
+        <g>
+          <rect x="3" y="4" width="26" height="24" rx="7" style={f('s1')} />
+          <text x="16" y="21.5" textAnchor="middle" fontSize="15" fontWeight="800" style={f('s2')} fontFamily="var(--font)">
+            42
+          </text>
+        </g>
+      )}
     </svg>
   )
 }

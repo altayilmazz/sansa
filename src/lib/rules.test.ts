@@ -7,6 +7,8 @@ import { checkDraw, drawWinners, nextPool } from './rules/draw'
 import { addRound, matchWinner } from './rules/match'
 import { coinOutcome } from './rules/coin'
 import { diceOutcome, rollDice } from './rules/dice'
+import { flagsLeft, neighbors, newGame, reveal, toggleFlag } from './rules/mines'
+import { checkRange, generate } from './rules/number'
 import { cardOutcome, Deck, fullDeck, type Card } from './rules/cards'
 
 /** Verilen değerleri sırayla döndüren deterministik kaynak. */
@@ -257,5 +259,58 @@ describe('kart destesi', () => {
     expect(cardOutcome(c(14, 'sinek'), c(13, 'maca'))).toBe('a')
     expect(cardOutcome(c(2, 'maca'), c(3, 'sinek'))).toBe('b')
     expect(cardOutcome(c(10, 'kupa'), c(10, 'maca'))).toBe('berabere')
+  })
+})
+
+describe('mayın tarlası', () => {
+  const lvl = { rows: 8, cols: 8, mines: 10 }
+  it('ilk dokunuş ve çevresi mayınsızdır, mayın sayısı doğrudur', () => {
+    for (let k = 0; k < 30; k++) {
+      const first = 27
+      const g = reveal(newGame(lvl), first)
+      expect(g.state).toBe('play')
+      expect(g.cells.filter((c) => c.mine).length).toBe(10)
+      expect(g.cells[first].mine).toBe(false)
+      neighbors(g, first).forEach((j) => expect(g.cells[j].mine).toBe(false))
+    }
+  })
+  it('komşu sayıları mayınlarla tutarlıdır', () => {
+    const g = reveal(newGame(lvl), 0)
+    g.cells.forEach((c, i) => expect(c.n).toBe(neighbors(g, i).filter((j) => g.cells[j].mine).length))
+  })
+  it('mayına basmak kaybettirir, tüm güvenli hücreleri açmak kazandırır', () => {
+    let g = reveal(newGame(lvl), 0)
+    const mine = g.cells.findIndex((c) => c.mine)
+    expect(reveal(g, mine).state).toBe('lost')
+    g.cells.forEach((c, i) => {
+      if (!c.mine && g.state === 'play') g = reveal(g, i)
+    })
+    expect(g.state).toBe('won')
+  })
+  it('bayrak açık hücreye konmaz ve sayılır', () => {
+    let g = newGame(lvl)
+    g = toggleFlag(g, 5)
+    expect(flagsLeft(g)).toBe(9)
+    g = toggleFlag(g, 5)
+    expect(flagsLeft(g)).toBe(10)
+  })
+})
+
+describe('rastgele sayı', () => {
+  it('aralık içinde kalır ve uçları üretir', () => {
+    const seen = new Set<number>()
+    for (let i = 0; i < 400; i++) generate(3, 6, 1, false).forEach((v) => seen.add(v))
+    expect([...seen].sort()).toEqual([3, 4, 5, 6])
+  })
+  it('tekrarsız üretimde tekrar yoktur', () => {
+    const out = generate(1, 10, 10, true)
+    expect(new Set(out).size).toBe(10)
+    expect(generate(1, 1_000_000, 20, true).length).toBe(20)
+  })
+  it('geçersiz girdileri reddeder', () => {
+    expect(checkRange(5, 1, 1, false).ok).toBe(false)
+    expect(checkRange(1, 3, 4, true).ok).toBe(false)
+    expect(checkRange(1.5, 3, 1, false).ok).toBe(false)
+    expect(checkRange(1, 3, 3, true).ok).toBe(true)
   })
 })
