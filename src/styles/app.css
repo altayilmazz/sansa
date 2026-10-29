@@ -2185,16 +2185,17 @@ textarea.field {
   position: relative;
   font-size: 26cqw;
   line-height: 1;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
 }
+/* Işıma yalnızca taşın dış çevresinde; içi düz renk kalır. */
 .chess__win.is-w .pc {
   color: #ffffff;
-  -webkit-text-stroke: 1.5px #ffffff;
-  text-shadow: 0 0 4px #fff, 0 0 13px #fff, 0 0 29px #fff, 0 0 42px rgba(255, 255, 255, 0.9);
+  filter: drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 6px rgba(255, 255, 255, 0.55));
 }
 .chess__win.is-b .pc {
   color: #000000;
-  -webkit-text-stroke: 1.5px #000000;
-  text-shadow: 0 0 4px #000, 0 0 13px #000, 0 0 29px #000, 0 0 42px rgba(0, 0, 0, 0.9);
+  filter: drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
 }
 @keyframes chess-win-in {
   from {
