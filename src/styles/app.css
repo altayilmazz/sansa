@@ -1281,7 +1281,7 @@ textarea.field {
   letter-spacing: -0.04em;
   text-shadow: 0 1px 0 rgba(255, 240, 200, 0.6);
   /* "1" rakamının mürekkep merkezi satır kutusunun merkezinden bir miktar farklı; ölçülüp düzeltildi */
-  transform: translate(var(--num-dx, 0), var(--num-dy, 0));
+  transform: translate(calc(var(--coin, 168px) * -0.05), 0);
 }
 .coin__word {
   position: absolute;
@@ -1443,12 +1443,12 @@ textarea.field {
   overflow: hidden;
 }
 .pcard__face {
-  background: #f8f5ee;
-  color: #1c1c1e;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  background: var(--cf-bg, #f8f5ee);
+  color: var(--cf-ink, #1c1c1e);
+  box-shadow: inset 0 0 0 1px var(--cf-edge, rgba(0, 0, 0, 0.08));
 }
 .pcard__face.is-red {
-  color: #d1202f;
+  color: var(--cf-red, #d1202f);
 }
 .pcard__corner {
   position: absolute;
@@ -1533,31 +1533,30 @@ textarea.field {
   font-weight: 600;
 }
 .pcard__back {
-  background: #3d3bb3;
+  background: var(--cb-frame, #f4f1ea);
   padding: 6%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
 }
 .pcard__back-inner {
+  position: relative;
   width: 100%;
   height: 100%;
-  border-radius: calc(var(--w) * 0.05);
-  border: 1.5px solid rgba(244, 241, 234, 0.75);
-  background-color: #34329c;
-  background-image: repeating-linear-gradient(45deg, rgba(244, 241, 234, 0.13) 0 1.5px, transparent 1.5px 9px),
-    repeating-linear-gradient(-45deg, rgba(244, 241, 234, 0.13) 0 1.5px, transparent 1.5px 9px);
+  border-radius: calc(var(--w) * 0.04);
+  background-color: var(--cb-base, #c0262d);
+  /* Klasik iskambil sırtı: elmas kafes ve çift çerçeve */
+  background-image:
+    repeating-linear-gradient(45deg, transparent 0 calc(var(--w) * 0.055), color-mix(in srgb, var(--cb-line) 55%, transparent) calc(var(--w) * 0.055) calc(var(--w) * 0.062)),
+    repeating-linear-gradient(-45deg, transparent 0 calc(var(--w) * 0.055), color-mix(in srgb, var(--cb-line) 55%, transparent) calc(var(--w) * 0.055) calc(var(--w) * 0.062));
+  box-shadow: inset 0 0 0 calc(var(--w) * 0.018) var(--cb-base), inset 0 0 0 calc(var(--w) * 0.03) var(--cb-line);
   display: grid;
   place-items: center;
 }
 .pcard__back-mark {
-  width: calc(var(--w) * 0.34);
-  height: calc(var(--w) * 0.34);
-  border-radius: 50%;
-  background: #f4f1ea;
-  color: #3d3bb3;
-  display: grid;
-  place-items: center;
-  font-size: calc(var(--w) * 0.2);
-  line-height: 1;
-  font-weight: 800;
+  width: calc(var(--w) * 0.24);
+  height: calc(var(--w) * 0.24);
+  transform: rotate(45deg);
+  background: var(--cb-base, #c0262d);
+  box-shadow: 0 0 0 calc(var(--w) * 0.02) var(--cb-line), inset 0 0 0 calc(var(--w) * 0.03) var(--cb-base), inset 0 0 0 calc(var(--w) * 0.04) var(--cb-line);
 }
 .table {
   display: flex;

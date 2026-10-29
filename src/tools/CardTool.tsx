@@ -1,5 +1,5 @@
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { uid } from '../lib/random'
 import { cardName, cardOutcome, Deck, type Card } from '../lib/rules/cards'
 import type { RoundOutcome, Side } from '../lib/rules/match'
@@ -7,8 +7,10 @@ import { haptic, sfx } from '../features/sound'
 import { useBusy, useMounted, useReducedMotion, wait } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { CardFan } from '../objects/CardFan'
-import { CardBack, CardFace } from '../objects/PlayingCard'
-import { Button, Notice } from '../ui/controls'
+import { CARD_BACKS, CardBack, CardFace, cardVars, isBackId } from '../objects/PlayingCard'
+import { useTheme } from '../state/useTheme'
+import { Swatches } from '../ui/Swatches'
+import { Button, Notice, Row, Switch } from '../ui/controls'
 import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
@@ -48,6 +50,11 @@ function Slot({ label, card, reduced, highlight, active }: { label?: string; car
 
 export function CardTool() {
   const [duel, setDuel] = usePersistent('kart:duel2', false, isBool)
+  const [back, setBack] = usePersistent('kart:back', 'sistem', isBackId)
+  const theme = useTheme()
+  // Açık temada "sistem" sırtı, her açılışta kırmızı ya da mavi olur.
+  const blue = useMemo(() => Math.random() < 0.5, [])
+  const vars = cardVars(theme, back, blue)
   const deck = useRef<Deck>(null as unknown as Deck)
   if (!deck.current) deck.current = new Deck()
   const [, setVersion] = useState(0)
@@ -149,7 +156,7 @@ export function CardTool() {
 
   const stage = (
     <>
-      <div className="stage-body card-stage">
+      <div className="stage-body card-stage" style={vars}>
         <LayoutGroup>
           <div className={`table${duel ? ' table--duel' : ''}`}>
             {duel ? (
@@ -209,7 +216,6 @@ export function CardTool() {
         right={
           <>
             <RoundButton icon="shuffle" label="Kalan kartları karıştır" disabled={busy || remaining < 2} onClick={shuffle} />
-            <RoundButton icon="refresh" label="Desteyi sıfırla" disabled={busy || remaining === 52} onClick={resetDeck} />
           </>
         }
       />
@@ -235,6 +241,31 @@ export function CardTool() {
       tool="kart"
       stage={stage}
       action={action}
+      settings={
+        <>
+          <Row label="Kart sırtı rengi" hint="Sistem: temaya uyar. Ön yüz renkleri her zaman temaya göre seçilir." />
+          <Swatches
+            label="Kart sırtı rengi"
+            value={back}
+            onChange={setBack}
+            options={[
+              { value: 'sistem', label: 'Sistem', style: { background: String(vars['--cb-base' as keyof typeof vars]), boxShadow: `inset 0 0 0 3px ${String(vars['--cb-frame' as keyof typeof vars])}` } },
+              ...CARD_BACKS.map((b) => ({ value: b.id, label: b.name, style: { background: b.base, boxShadow: `inset 0 0 0 3px ${b.frame}` } })),
+            ]}
+          />
+          <Row label="Karşılaşma" hint="İki oyuncu birer kart çeker, yüksek kart kazanır.">
+            <Switch
+              checked={duel}
+              label="Karşılaşma"
+              disabled={busy}
+              onChange={(v) => {
+                setDuel(v)
+                clearTable()
+              }}
+            />
+          </Row>
+        </>
+      }
       onReset={resetDeck}
       resetDisabled={busy}
       live={live}
@@ -244,12 +275,12 @@ export function CardTool() {
               'Standart 52 kartlık deste, joker yok.',
               'Değer sırası 2’den As’a yükselir; As en yüksektir.',
               'Türler arasında üstünlük yoktur; aynı değer berabere sayılır ve tur yeniden oynanır.',
-              'Sol alttaki iki düğme tek kart ile yüksek kart karşılaşması arasında geçer; sağ alttakiler kalan kartları karıştırır ve desteyi sıfırlar.',
+              'Sol alttaki iki düğme tek kart ile yüksek kart karşılaşması arasında geçer; sağ alttaki düğme kalan kartları karıştırır; desteyi sıfırlamak için sol üstteki düğmeyi kullan. Kart rengini Ayarlar bölümünden değiştirebilirsin.',
             ]
           : [
               'Standart 52 kartlık deste, joker yok.',
               'Çekilen kart deste sıfırlanana kadar yeniden çıkmaz.',
-              'Sol alttaki iki düğme tek kart ile yüksek kart karşılaşması arasında geçer; sağ alttakiler kalan kartları karıştırır ve desteyi sıfırlar.',
+              'Sol alttaki iki düğme tek kart ile yüksek kart karşılaşması arasında geçer; sağ alttaki düğme kalan kartları karıştırır; desteyi sıfırlamak için sol üstteki düğmeyi kullan. Kart rengini Ayarlar bölümünden değiştirebilirsin.',
             ]
       }
     />

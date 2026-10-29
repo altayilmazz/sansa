@@ -64,6 +64,7 @@ const paths = {
       <rect x="11" y="4.5" width="9.5" height="13" rx="2" transform="rotate(10 15.7 11)" />
     </>
   ),
+  crown: <path d="M4 18.5h16M4.5 17L3 8l5 4 4-7 4 7 5-4-1.5 9z" />,
   undo: <path d="M9 14L4 9l5-5M4 9h10a6 6 0 010 12h-3" />,
 } as const
 

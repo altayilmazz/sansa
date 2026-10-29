@@ -8,7 +8,7 @@ import { useBusy, useMounted, useReducedMotion, wait } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { isEntryList } from '../lib/storage'
 import { copyText } from '../ui/clipboard'
-import { Button, Notice, Stepper } from '../ui/controls'
+import { Button, Notice, Row, Stepper } from '../ui/controls'
 import { EntryChips } from '../ui/EntryChips'
 import { useEntryEditor } from '../ui/EntryEditor'
 import { useExample } from '../ui/ExampleBanner'
@@ -183,6 +183,11 @@ export function TeamsTool() {
       tool="takim"
       stage={stage}
       action={action}
+      settings={
+        <Row label="Takım sayısı" hint={`${entries.length} kişi`}>
+          <Stepper value={count} min={MIN_TEAMS} max={MAX_TEAMS} onChange={setCount} label="Takım sayısı" disabled={busy} format={(n) => `${n} takım`} />
+        </Row>
+      }
       onReset={() => {
         setEntries([])
         setTeams(null)

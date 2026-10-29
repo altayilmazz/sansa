@@ -7,7 +7,7 @@ import { isEntryList } from '../lib/storage'
 import { haptic, sfx } from '../features/sound'
 import { useBusy, useMounted, useReducedMotion, wait } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
-import { Button, Group, Notice, Row, Stepper } from '../ui/controls'
+import { Button, Notice, Row, Stepper, Switch } from '../ui/controls'
 import { EntryChips } from '../ui/EntryChips'
 import { useEntryEditor } from '../ui/EntryEditor'
 import { useExample } from '../ui/ExampleBanner'
@@ -59,16 +59,21 @@ export function DrawTool() {
   }, [entries, drawnIds, removeDrawn])
 
   const struck = useMemo(() => new Set(removeDrawn ? drawnIds : []), [removeDrawn, drawnIds])
-  const check = checkDraw(pool.length, count)
   const maxCount = Math.max(1, pool.length)
+  const n = Math.min(count, maxCount)
+  const check = checkDraw(pool.length, n)
   const exhausted = removeDrawn && entries.length > 0 && pool.length === 0
 
   const editor = useEntryEditor({ entries, onChange: setEntries, noun: 'kayıt', placeholder: 'Selin, Mert, Ece', disabled: busy })
 
+  // Çekilenler biletlerde görünür; yan listede ikinci kez yazılmaz.
+  const shown = new Set(phase === 'reveal' || phase === 'done' ? (winners ?? []).map((w) => w.id) : [])
+  const listed = entries.filter((e) => !struck.has(e.id) && !shown.has(e.id))
+
   const draw = () =>
     run(async () => {
       if (!check.ok) return
-      const result = drawWinners(pool, count)
+      const result = drawWinners(pool, n)
       const key = uid()
       const poolSize = pool.length
       setLive('')
@@ -126,7 +131,7 @@ export function DrawTool() {
                 <span />
                 <span />
               </div>
-              <p>Alttaki kutuya kişi ya da seçenek yaz. Kaç kazanan çekileceğini aşağı kaydırınca ayarlarsın.</p>
+              <p>Alttaki kutuya kişi ya da seçenek yaz. Soldaki taç düğmeleriyle kaç kazanan çekileceğini seç.</p>
             </div>
           ) : phase === 'reveal' || phase === 'done' ? (
             <ol className="tickets" aria-label="Kura sonucu">
@@ -156,11 +161,11 @@ export function DrawTool() {
             </div>
           )}
         </div>
-        {pool.length > 0 && (
+        {listed.length > 0 && (
           <div className="draw-side">
             <EntryChips
               variant="list"
-              entries={entries.filter((e) => !struck.has(e.id))}
+              entries={listed}
               struck={new Set<string>()}
               disabled={busy}
               lead={undo}
@@ -172,6 +177,21 @@ export function DrawTool() {
       </div>
       {entries.length > 0 && !check.ok && <Notice tone="error">{pool.length === 0 ? 'Havuzda çekilecek kayıt kalmadı. Havuzu sıfırla ya da yeni kayıt ekle.' : check.error}</Notice>}
       <StageBar
+        left={
+          <>
+            <RoundButton label="1 kazanan" on={n === 1} disabled={busy} onClick={() => setCount(1)}>
+              <span className="crownbtn">
+                <Icon name="crown" size={20} />
+              </span>
+            </RoundButton>
+            <RoundButton label="2 kazanan" on={n === 2} disabled={busy || maxCount < 2} onClick={() => setCount(2)}>
+              <span className="crownbtn">
+                <Icon name="crown" size={15} />
+                <Icon name="crown" size={15} />
+              </span>
+            </RoundButton>
+          </>
+        }
         right={
           <RoundButton
             icon="strike"
@@ -185,11 +205,13 @@ export function DrawTool() {
     </>
   )
 
-  // Ayarlar yalnızca aşağı kaydırınca görünür.
-  const controls = (
-    <Group title="Çekiliş" id="kura-ayar">
-      <Row label="Kazanan sayısı">
-        <Stepper value={Math.min(count, maxCount)} min={1} max={maxCount} onChange={setCount} label="Kazanan sayısı" disabled={busy || pool.length === 0} />
+  const settings = (
+    <>
+      <Row label="Kazanan sayısı" hint="Sahnedeki taç düğmeleri 1 ve 2 içindir; daha fazlası için buradan ayarla.">
+        <Stepper value={n} min={1} max={maxCount} onChange={setCount} label="Kazanan sayısı" disabled={busy || pool.length === 0} />
+      </Row>
+      <Row label="Çekileni sonraki turlardan çıkar">
+        <Switch checked={removeDrawn} onChange={setRemoveDrawn} label="Çekileni sonraki turlardan çıkar" disabled={busy} />
       </Row>
       {removeDrawn && entries.length > 0 && (
         <Row label="Çekilenleri geri koy" hint={`${pool.length} / ${entries.length} kayıt çekilebilir`}>
@@ -198,7 +220,7 @@ export function DrawTool() {
           </Button>
         </Row>
       )}
-    </Group>
+    </>
   )
 
   const action = exhausted ? (
@@ -207,7 +229,7 @@ export function DrawTool() {
     </Button>
   ) : (
     <Button variant="primary" size="lg" block onClick={draw} disabled={busy || !check.ok}>
-      {busy ? 'Çekiliyor…' : phase === 'done' ? 'Yeniden çek' : count > 1 ? `${count} kazanan çek` : 'Kura çek'}
+      {busy ? 'Çekiliyor…' : phase === 'done' ? 'Yeniden çek' : n > 1 ? `${n} kazanan çek` : 'Kura çek'}
     </Button>
   )
 
@@ -223,7 +245,7 @@ export function DrawTool() {
         setLive('Sıfırlandı.')
       }}
       resetDisabled={busy || (entries.length === 0 && !winners)}
-      controls={controls}
+      settings={settings}
       action={action}
       adder={editor.adder}
       extra={editor.listActions}
@@ -233,7 +255,7 @@ export function DrawTool() {
       rules={[
         'Havuzdaki her kaydın seçilme olasılığı eşittir.',
         'Bir çekilişte aynı kayıt birden fazla kez seçilmez.',
-        'Kazanan sayısı havuzdaki kayıt sayısını geçemez; sayıyı aşağı kaydırınca ayarlarsın.',
+        'Kazanan sayısı havuzdaki kayıt sayısını geçemez; soldaki taç düğmeleri 1 ve 2 içindir, daha fazlasını Ayarlar bölümünden seç.',
         'Sağ alttaki çizgili düğme açıkken çekilen kayıt sonraki turlardan çıkar ve listede üstü çizili görünür.',
         'Bir adı düzenlemek için dokun; silmek için basılı tutup alttaki çöp kutusuna sürükle. Soldaki ok son eklenen adı çıkarır.',
       ]}

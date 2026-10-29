@@ -8,7 +8,7 @@ import { haptic, sfx } from '../features/sound'
 import { useBusy, useMounted, useReducedMotion, wait } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { labelBudget, Wheel, type WheelHandle } from '../objects/Wheel'
-import { Button } from '../ui/controls'
+import { Button, Row, Switch } from '../ui/controls'
 import { useEntryEditor } from '../ui/EntryEditor'
 import { useExample } from '../ui/ExampleBanner'
 import { RoundButton, StageBar } from '../ui/StageButtons'
@@ -176,6 +176,11 @@ export function WheelTool() {
       tool="cark"
       stage={stage}
       action={action}
+      settings={
+        <Row label="Kazananı çıkar" hint="Sonuçtan sonra “Çıkar” ve “Yeniden çevir” düğmeleri görünür.">
+          <Switch checked={removeWinner} onChange={setRemoveWinner} label="Kazananı çıkar" disabled={busy} />
+        </Row>
+      }
       onReset={() => {
         setOptions([])
         setWinner(null)

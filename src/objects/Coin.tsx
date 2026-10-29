@@ -61,13 +61,11 @@ export const Coin = forwardRef<CoinHandle, CoinProps>(function Coin({ size = 180
         <div className="coin__face coin__face--yazi">
           <div className="coin__ring">
             <span className="coin__num">1</span>
-            <span className="coin__word">Yazı</span>
           </div>
         </div>
         <div className="coin__face coin__face--tura">
           <div className="coin__ring">
             <CoinSymbol id={symbol} size={size * 0.42} color={tura.ink} />
-            <span className="coin__word">Tura</span>
           </div>
         </div>
       </div>

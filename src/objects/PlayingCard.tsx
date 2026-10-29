@@ -57,8 +57,62 @@ export function CardBack() {
   return (
     <div className="pcard__back" aria-hidden="true">
       <div className="pcard__back-inner">
-        <span className="pcard__back-mark">Ş</span>
+        <span className="pcard__back-mark" />
       </div>
     </div>
   )
+}
+
+export interface CardBackColor {
+  id: string
+  name: string
+  base: string
+  frame: string
+  line: string
+}
+
+/** Kart sırtı renk seçenekleri ("sistem" ayrıca temaya göre seçilir). */
+export const CARD_BACKS: CardBackColor[] = [
+  { id: 'beyaz', name: 'Beyaz', base: '#ececec', frame: '#ffffff', line: '#9a9a9a' },
+  { id: 'siyah', name: 'Siyah', base: '#151517', frame: '#2c2c30', line: '#6a6a70' },
+  { id: 'yesil', name: 'Yeşil', base: '#1f7a4d', frame: '#f4f1ea', line: '#d8f0e2' },
+  { id: 'sari', name: 'Sarı', base: '#e0b100', frame: '#fbf7e8', line: '#7a5d00' },
+  { id: 'mavi', name: 'Mavi', base: '#2b4fc4', frame: '#f4f1ea', line: '#cfd9ff' },
+  { id: 'kirmizi', name: 'Kırmızı', base: '#c0262d', frame: '#f4f1ea', line: '#ffd9d9' },
+  { id: 'mor', name: 'Mor', base: '#6b3fb0', frame: '#f4f1ea', line: '#e4d8ff' },
+  { id: 'turuncu', name: 'Turuncu', base: '#e1741f', frame: '#f4f1ea', line: '#ffe3cc' },
+  { id: 'kahverengi', name: 'Kahverengi', base: '#7a4a2b', frame: '#f4f1ea', line: '#f0d9c4' },
+  { id: 'gri', name: 'Gri', base: '#7d7f86', frame: '#f4f1ea', line: '#e6e7ea' },
+]
+export const isBackId = (v: unknown): v is string => v === 'sistem' || (typeof v === 'string' && CARD_BACKS.some((b) => b.id === v))
+
+type Theme = 'light' | 'dark' | 'special'
+
+/** Temaya göre ön yüz renkleri. */
+const FACES: Record<Theme, { bg: string; ink: string; red: string; edge: string }> = {
+  light: { bg: '#f8f5ee', ink: '#1c1c1e', red: '#d1202f', edge: 'rgba(0,0,0,0.08)' },
+  dark: { bg: '#1c1c1e', ink: '#ecebe6', red: '#c9232d', edge: 'rgba(255,255,255,0.14)' },
+  special: { bg: '#faf9f5', ink: '#3b3a36', red: '#d97757', edge: 'rgba(0,0,0,0.08)' },
+}
+
+/** "Sistem" sırtı: koyu temada siyah, Claude temasında turuncu, açık temada kırmızı ya da mavi. */
+function systemBack(theme: Theme, blue: boolean): CardBackColor {
+  if (theme === 'dark') return { id: 'sistem', name: 'Sistem', base: '#0e0e10', frame: '#2c2c30', line: '#5a5a60' }
+  if (theme === 'special') return { id: 'sistem', name: 'Sistem', base: '#d97757', frame: '#faf9f5', line: '#fff0e8' }
+  return { ...CARD_BACKS.find((b) => b.id === (blue ? 'mavi' : 'kirmizi'))!, id: 'sistem', name: 'Sistem' }
+}
+
+/** Kart sahnesine uygulanan renk değişkenleri. */
+export function cardVars(theme: Theme, back: string, blue: boolean): CSSProperties {
+  const f = FACES[theme]
+  const b = back === 'sistem' ? systemBack(theme, blue) : (CARD_BACKS.find((x) => x.id === back) ?? systemBack(theme, blue))
+  return {
+    '--cf-bg': f.bg,
+    '--cf-ink': f.ink,
+    '--cf-red': f.red,
+    '--cf-edge': f.edge,
+    '--cb-base': b.base,
+    '--cb-frame': b.frame,
+    '--cb-line': b.line,
+  } as CSSProperties
 }

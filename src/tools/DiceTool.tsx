@@ -7,7 +7,7 @@ import { haptic, sfx } from '../features/sound'
 import { useBusy, useMounted, useReducedMotion, useMedia } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { Die, type DieHandle } from '../objects/Die'
-import { Button } from '../ui/controls'
+import { Button, Row, Segmented, Switch } from '../ui/controls'
 import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
@@ -200,6 +200,36 @@ export function DiceTool() {
       tool="zar"
       stage={stage}
       action={action}
+      settings={
+        <>
+          <Row label="Zar sayısı">
+            <Segmented
+              label="Zar sayısı"
+              value={countS}
+              disabled={busy}
+              options={[
+                { value: '1', label: '1' },
+                { value: '2', label: '2' },
+              ]}
+              onChange={(v) => {
+                setCountS(v)
+                clear()
+              }}
+            />
+          </Row>
+          <Row label="Karşılaşma" hint="İki oyuncu atar, yüksek toplam kazanır.">
+            <Switch
+              checked={duel}
+              label="Karşılaşma"
+              disabled={busy}
+              onChange={(v) => {
+                setDuel(v)
+                clear()
+              }}
+            />
+          </Row>
+        </>
+      }
       onReset={() => {
         setVals(null)
         setOutcome(null)

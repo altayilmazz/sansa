@@ -27,11 +27,13 @@ interface Props {
   /** Araca ait ek pencereler (ör. kayıtlı listeler). */
   overlays?: ReactNode
   /** Sol üstteki sıfırlama düğmesi: aracın listesini ve sonucunu temizler. */
+  /** Bilgi penceresindeki Ayarlar bölümü (aracın ayrıntılı seçenekleri). */
+  settings?: ReactNode
   onReset?: () => void
   resetDisabled?: boolean
 }
 
-export function ToolScaffold({ tool, stage, controls, action, rules, live, banner, adder, extra, overlays, onReset, resetDisabled }: Props) {
+export function ToolScaffold({ tool, stage, controls, action, rules, live, banner, adder, extra, overlays, settings, onReset, resetDisabled }: Props) {
   const meta = TOOLS[tool]
   const title = useRef<HTMLHeadingElement>(null)
   const [info, setInfo] = useState(false)
@@ -80,6 +82,14 @@ export function ToolScaffold({ tool, stage, controls, action, rules, live, banne
         </div>
 
         <Sheet open={info} onClose={() => setInfo(false)} title={meta.name}>
+          {settings && (
+            <section className="info" aria-labelledby={`info-set-${tool}`}>
+              <h3 className="info__title" id={`info-set-${tool}`}>
+                Ayarlar
+              </h3>
+              <div className="info__settings">{settings}</div>
+            </section>
+          )}
           <section className="info" aria-labelledby={`info-rules-${tool}`}>
             <h3 className="info__title" id={`info-rules-${tool}`}>
               Kurallar
