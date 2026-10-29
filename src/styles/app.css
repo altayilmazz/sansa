@@ -1287,7 +1287,7 @@ textarea.field {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 9%;
+  bottom: 3%;
   text-align: center;
   font-size: calc(var(--coin, 168px) * 0.083);
   font-weight: 700;
@@ -1734,8 +1734,7 @@ textarea.field {
   right: 0;
   z-index: 2;
   max-width: 48%;
-  max-height: 42%;
-  overflow-y: auto;
+  overflow: visible;
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;

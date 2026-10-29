@@ -155,20 +155,20 @@
 
   --shadow-object: 0 18px 36px -14px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.16);
   /* Çark, kase ve bilet paleti */
-  --wheel-1: #d97757;
+  --wheel-1: #1d1d1f;
   --wheel-1t: #ffffff;
-  --wheel-2: #3d3929;
-  --wheel-2t: #faf9f5;
-  --wheel-3: #f0eee6;
-  --wheel-3t: #2b2a28;
-  --wheel-4: #b5553a;
-  --wheel-4t: #ffffff;
-  --wheel-rim: #2b2a28;
-  --wheel-hub: #2b2a28;
-  --wheel-hub-line: #4a4945;
-  --wheel-peg: #f0eee6;
-  --wheel-pointer: #2b2a28;
-  --wheel-pointer-dot: #faf9f5;
+  --wheel-2: #f5f5f7;
+  --wheel-2t: #1d1d1f;
+  --wheel-3: #8e8e93;
+  --wheel-3t: #ffffff;
+  --wheel-4: #d1d1d6;
+  --wheel-4t: #1d1d1f;
+  --wheel-rim: #1d1d1f;
+  --wheel-hub: #1d1d1f;
+  --wheel-hub-line: #8e8e93;
+  --wheel-peg: #f5f5f7;
+  --wheel-pointer: #1d1d1f;
+  --wheel-pointer-dot: #ffffff;
   --bowl: #c6613f;
   --bowl-rim: #d97757;
   --slip-a: #ffffff;

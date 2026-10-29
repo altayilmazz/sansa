@@ -183,6 +183,13 @@ export function TeamsTool() {
       tool="takim"
       stage={stage}
       action={action}
+      onReset={() => {
+        setEntries([])
+        setTeams(null)
+        setPhase('idle')
+        setLive('Sıfırlandı.')
+      }}
+      resetDisabled={busy || (entries.length === 0 && !teams)}
       adder={editor.adder}
       extra={editor.listActions}
       overlays={editor.sheets}

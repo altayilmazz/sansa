@@ -140,16 +140,34 @@ export function WheelTool() {
     </>
   )
 
+  const removeOnly = () => {
+    if (!winner) return
+    setOptions(options.filter((o) => o.id !== winner.id))
+    setWinner(null)
+    setWinnerIdx(null)
+    setLive(`“${winner.name}” çarktan çıkarıldı.`)
+  }
+
+  const spinLabel = busy ? 'Dönüyor…' : winner ? 'Yeniden çevir' : 'Çarkı çevir'
   const action = (
     <>
-      {willRemove && !busy && (
-        <p className="actionbar__note">
-          {nextCount >= MIN_OPTIONS ? `Sonraki turda “${winner.name}” çarktan çıkarılacak.` : `“${winner.name}” çıkarılınca tek seçenek kalıyor; yeni seçenek ekle ya da sağ alttaki düğmeyi kapat.`}
-        </p>
+      {willRemove && !busy && nextCount < MIN_OPTIONS && (
+        <p className="actionbar__note">“{winner.name}” çıkarılınca tek seçenek kalıyor; yeni seçenek ekle.</p>
       )}
-      <Button variant="primary" size="lg" block onClick={spin} disabled={busy || nextCount < MIN_OPTIONS}>
-        {busy ? 'Dönüyor…' : willRemove ? 'Çıkar ve yeniden çevir' : winner ? 'Yeniden çevir' : 'Çarkı çevir'}
-      </Button>
+      {willRemove ? (
+        <div className="actionbar__split">
+          <Button variant="secondary" size="lg" block onClick={removeOnly} disabled={busy}>
+            Çıkar
+          </Button>
+          <Button variant="primary" size="lg" block onClick={spin} disabled={busy || nextCount < MIN_OPTIONS}>
+            {spinLabel}
+          </Button>
+        </div>
+      ) : (
+        <Button variant="primary" size="lg" block onClick={spin} disabled={busy || options.length < MIN_OPTIONS}>
+          {spinLabel}
+        </Button>
+      )}
     </>
   )
 
@@ -158,6 +176,13 @@ export function WheelTool() {
       tool="cark"
       stage={stage}
       action={action}
+      onReset={() => {
+        setOptions([])
+        setWinner(null)
+        setWinnerIdx(null)
+        setLive('Sıfırlandı.')
+      }}
+      resetDisabled={busy || (options.length === 0 && !winner)}
       adder={editor.adder}
       extra={editor.listActions}
       overlays={editor.sheets}
@@ -167,7 +192,7 @@ export function WheelTool() {
         'Her seçeneğin çıkma olasılığı eşittir.',
         'Sonuç çark dönmeden önce belirlenir; çark işaretçinin gösterdiği dilimde durur.',
         'Bir seçeneği silmek için çarktaki adına dokun, çıkan küçük çöp düğmesine bas.',
-        'Sağ alttaki çizgili düğme açıkken çıkan seçenek, bir sonraki çevirişten önce çarktan kaldırılır.',
+        'Sağ alttaki çizgili düğme açıkken sonuçtan sonra iki düğme çıkar: “Çıkar” kazananı çarktan alır, “Yeniden çevir” kazananı çıkarıp hemen çevirir.',
         'En az iki seçenek gerekir.',
       ]}
     />

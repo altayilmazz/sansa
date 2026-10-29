@@ -3,6 +3,7 @@ import { navigate } from '../state/router'
 import { TOOLS, type ToolId } from '../state/tools'
 import { ToolGlyph } from '../objects/ToolGlyph'
 import { IconButton } from './controls'
+import { Icon } from './Icon'
 import { DeleteZone, DragDeleteProvider } from './dragDelete'
 import { Sheet } from './Sheet'
 import { ExampleChips } from './ToolHost'
@@ -25,9 +26,12 @@ interface Props {
   extra?: (close: () => void) => ReactNode
   /** Araca ait ek pencereler (ör. kayıtlı listeler). */
   overlays?: ReactNode
+  /** Sol üstteki sıfırlama düğmesi: aracın listesini ve sonucunu temizler. */
+  onReset?: () => void
+  resetDisabled?: boolean
 }
 
-export function ToolScaffold({ tool, stage, controls, action, rules, live, banner, adder, extra, overlays }: Props) {
+export function ToolScaffold({ tool, stage, controls, action, rules, live, banner, adder, extra, overlays, onReset, resetDisabled }: Props) {
   const meta = TOOLS[tool]
   const title = useRef<HTMLHeadingElement>(null)
   const [info, setInfo] = useState(false)
@@ -55,6 +59,11 @@ export function ToolScaffold({ tool, stage, controls, action, rules, live, banne
 
         <div className="tool__scroll">
           <section className="tool__stage" aria-label="Sahne">
+            {onReset && (
+              <button type="button" className="sbtn sbtn--sm stage-reset" aria-label="Sıfırla" title="Sıfırla" disabled={resetDisabled} onClick={onReset}>
+                <Icon name="refresh" size={16} />
+              </button>
+            )}
             {banner}
             {stage}
           </section>

@@ -235,6 +235,8 @@ export function CardTool() {
       tool="kart"
       stage={stage}
       action={action}
+      onReset={resetDeck}
+      resetDisabled={busy}
       live={live}
       rules={
         duel

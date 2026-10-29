@@ -156,12 +156,12 @@ export function DrawTool() {
             </div>
           )}
         </div>
-        {entries.length > 0 && (
+        {pool.length > 0 && (
           <div className="draw-side">
             <EntryChips
               variant="list"
-              entries={entries}
-              struck={struck}
+              entries={entries.filter((e) => !struck.has(e.id))}
+              struck={new Set<string>()}
               disabled={busy}
               lead={undo}
               onRename={editor.rename}
@@ -215,6 +215,14 @@ export function DrawTool() {
     <ToolScaffold
       tool="kura"
       stage={stage}
+      onReset={() => {
+        setEntries([])
+        setDrawnIds([])
+        setWinners(null)
+        setPhase('idle')
+        setLive('Sıfırlandı.')
+      }}
+      resetDisabled={busy || (entries.length === 0 && !winners)}
       controls={controls}
       action={action}
       adder={editor.adder}

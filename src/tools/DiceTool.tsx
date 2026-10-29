@@ -200,6 +200,12 @@ export function DiceTool() {
       tool="zar"
       stage={stage}
       action={action}
+      onReset={() => {
+        setVals(null)
+        setOutcome(null)
+        setLive('Sıfırlandı.')
+      }}
+      resetDisabled={busy || vals === null}
       live={live}
       rules={
         duel

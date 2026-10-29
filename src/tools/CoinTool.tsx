@@ -117,6 +117,11 @@ export function CoinTool() {
       tool="para"
       stage={stage}
       action={action}
+      onReset={() => {
+        setFace(null)
+        setLive('Sıfırlandı.')
+      }}
+      resetDisabled={busy || face === null}
       live={live}
       rules={[
         'Yazı ve tura eşit olasılıklıdır.',
