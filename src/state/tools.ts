@@ -1,4 +1,4 @@
-export type ToolId = 'takim' | 'cark' | 'kura' | 'para' | 'zar' | 'kart' | 'mayin' | 'sayi' | 'parmak' | 'rulet' | 'satranc' | 'cop' | 'sicak' | 'kutu' | 'top8'
+export type ToolId = 'takim' | 'cark' | 'kura' | 'para' | 'zar' | 'kart' | 'mayin' | 'sayi' | 'parmak' | 'rulet' | 'satranc' | 'sicak'
 
 export interface ToolMeta {
   id: ToolId
@@ -23,17 +23,14 @@ export const TOOLS: Record<ToolId, ToolMeta> = {
   parmak: { id: 'parmak', name: 'Parmak seçici', short: 'Parmak', blurb: 'Herkes parmağını koysun, biri seçilsin.', tint: 'var(--tint-parmak)' },
   rulet: { id: 'rulet', name: 'Rus ruleti', short: 'Rulet', blurb: 'Tetiği çek; mermi çıkarsa oyun biter.', tint: 'var(--tint-rulet)' },
   satranc: { id: 'satranc', name: 'Hızlı satranç', short: 'Satranç', blurb: 'Rastgele oynanan satranç; mat eden renk kazanır.', tint: 'var(--tint-satranc)' },
-  cop: { id: 'cop', name: 'Kısa çöp uzun çöp', short: 'Çöp', blurb: 'Sırayla çöp çek; kısa çıkan kaybeder.', tint: 'var(--tint-cop)' },
   sicak: { id: 'sicak', name: 'Sıcak patates', short: 'Patates', blurb: 'Gizli süre bitince telefon kimdeyse o kaybeder.', tint: 'var(--tint-sicak)' },
-  kutu: { id: 'kutu', name: 'Bardak altı', short: 'Bardak', blurb: 'Bardak kaldır; altından işaret çıkan kaybeder.', tint: 'var(--tint-kutu)' },
-  top8: { id: 'top8', name: 'Sihirli 8 top', short: '8 top', blurb: 'Evet ya da hayır sorusunu salla, cevabı gör.', tint: 'var(--tint-top8)' },
 }
 
-/** Çok parmaklı dokunma gerektiren araçlar yalnızca dokunmatik cihazlarda gösterilir. */
-const TOUCH_ONLY: ToolId[] = ['parmak']
+/** Parmakla ya da elden ele oynanan araçlar yalnızca dokunmatik cihazlarda gösterilir. */
+const TOUCH_ONLY: ToolId[] = ['parmak', 'sicak']
 const touch = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(any-pointer: coarse)').matches
 
-export const TOOL_ORDER: ToolId[] = (['takim', 'cark', 'kura', 'para', 'zar', 'kart', 'mayin', 'sayi', 'parmak', 'rulet', 'satranc', 'cop', 'sicak', 'kutu', 'top8'] as ToolId[]).filter((id) => touch || !TOUCH_ONLY.includes(id))
+export const TOOL_ORDER: ToolId[] = (['takim', 'cark', 'kura', 'para', 'zar', 'kart', 'mayin', 'sayi', 'parmak', 'rulet', 'satranc', 'sicak'] as ToolId[]).filter((id) => touch || !TOUCH_ONLY.includes(id))
 
 export const isToolId = (v: unknown): v is ToolId => typeof v === 'string' && v in TOOLS
 /** Bu cihazda gösterilen araç mı? (Geçmiş kayıtları için isToolId yeterlidir.) */

@@ -11,7 +11,7 @@ import { clampMines, maxMines, newGame, reveal, safeLeft } from './rules/mines'
 import { checkRange, generate } from './rules/number'
 import { legalMoves, perft, playRandomGame, START } from './rules/chess'
 import { load, pull } from './rules/roulette'
-import { ask, EIGHT_ANSWERS, fuseMs, liftCup, newCups, newStraws, pullStraw } from './rules/party'
+import { fuseMs } from './rules/party'
 import { cardOutcome, Deck, fullDeck, type Card } from './rules/cards'
 
 /** Verilen değerleri sırayla döndüren deterministik kaynak. */
@@ -350,33 +350,7 @@ describe('rus ruleti', () => {
   })
 })
 
-describe('parti oyunları', () => {
-  it('kısa çöp bir tanedir, çekilince oyun biter ve çekilmiş çöp değişmez', () => {
-    for (let n = 2; n <= 10; n++) {
-      let g = newStraws(n)
-      expect(g.short).toBeGreaterThanOrEqual(0)
-      expect(g.short).toBeLessThan(n)
-      for (let i = 0; i < n && g.state === 'play'; i++) g = pullStraw(g, i)
-      expect(g.state).toBe('short')
-      expect(g.pulled.length).toBe(g.short + 1)
-      expect(pullStraw(g, 0)).toBe(g)
-    }
-  })
-  it('kısa çöp her yerde eşit olasılıkla çıkar', () => {
-    const hits = [0, 0, 0, 0]
-    for (let i = 0; i < 4000; i++) hits[newStraws(4).short]++
-    for (const h of hits) expect(h).toBeGreaterThan(800)
-  })
-  it('bardaklardan tam biri işaretlidir ve kaldırınca oyun biter', () => {
-    for (let n = 3; n <= 6; n++) {
-      let g = newCups(n)
-      expect(g.order.length).toBe(n)
-      expect(g.order.filter((c) => c.bad).length).toBe(1)
-      for (const c of g.order) g = liftCup(g, c.id)
-      expect(g.state).toBe('over')
-      expect(liftCup(g, 0)).toBe(g)
-    }
-  })
+describe('sıcak patates', () => {
   it('patates süresi 3 sn ile üst sınır arasındadır', () => {
     for (const max of [10, 15, 30, 60]) {
       for (let i = 0; i < 300; i++) {
@@ -385,9 +359,5 @@ describe('parti oyunları', () => {
         expect(ms).toBeLessThanOrEqual(max * 1000)
       }
     }
-  })
-  it('8 topun cevapları tanımlı kümelerdendir', () => {
-    const all = new Set<string>([...EIGHT_ANSWERS.yes, ...EIGHT_ANSWERS.maybe, ...EIGHT_ANSWERS.no])
-    for (let i = 0; i < 200; i++) expect(all.has(ask().text)).toBe(true)
   })
 })
