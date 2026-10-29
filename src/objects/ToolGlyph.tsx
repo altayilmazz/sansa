@@ -116,6 +116,37 @@ export function ToolGlyph({ tool, size = 28 }: { tool: ToolId; size?: number }) 
           })}
         </g>
       )}
+      {tool === 'cop' && (
+        <g>
+          <rect x="6" y="3" width="4.6" height="26" rx="2.3" style={f('u2')} />
+          <rect x="13.7" y="3" width="4.6" height="14" rx="2.3" style={f('f1')} />
+          <rect x="21.4" y="3" width="4.6" height="26" rx="2.3" style={f('u2')} />
+          <rect x="3" y="20" width="26" height="9" rx="4.5" style={f('u1')} />
+        </g>
+      )}
+      {tool === 'sicak' && (
+        <g>
+          <ellipse cx="16" cy="19" rx="12" ry="9.5" style={f('u2')} />
+          <circle cx="12" cy="17" r="1.4" style={f('u1')} />
+          <circle cx="19" cy="21" r="1.4" style={f('u1')} />
+          <path d="M16 10c0-3 1-5 4-6" fill="none" style={{ stroke: 'var(--g-f1)' }} strokeWidth="2" strokeLinecap="round" />
+          <circle cx="21" cy="4" r="2.4" style={f('f1')} />
+        </g>
+      )}
+      {tool === 'kutu' && (
+        <g>
+          <circle cx="16" cy="25" r="3.4" style={f('f1')} />
+          <path d="M7 5h18l-2.6 17H9.6z" style={f('u2')} />
+          <path d="M9.6 22h12.8" style={{ stroke: 'var(--g-u1)' }} strokeWidth="2" strokeLinecap="round" />
+        </g>
+      )}
+      {tool === 'top8' && (
+        <g>
+          <circle cx="16" cy="16" r="13" style={f('u1')} />
+          <circle cx="16" cy="12" r="6" style={f('u2')} />
+          <path d="M16 8.5l3 5h-6z" style={f('u1')} />
+        </g>
+      )}
       {tool === 'satranc' && (
         <g>
           <rect x="3" y="3" width="26" height="26" rx="5" style={f('c2x')} />

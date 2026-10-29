@@ -19,6 +19,10 @@ const NumberTool = lazy(() => import('../tools/NumberTool').then((m) => ({ defau
 const FingerTool = lazy(() => import('../tools/FingerTool').then((m) => ({ default: m.FingerTool })))
 const RouletteTool = lazy(() => import('../tools/RouletteTool').then((m) => ({ default: m.RouletteTool })))
 const ChessTool = lazy(() => import('../tools/ChessTool').then((m) => ({ default: m.ChessTool })))
+const StrawTool = lazy(() => import('../tools/StrawTool').then((m) => ({ default: m.StrawTool })))
+const FuseTool = lazy(() => import('../tools/FuseTool').then((m) => ({ default: m.FuseTool })))
+const CupTool = lazy(() => import('../tools/CupTool').then((m) => ({ default: m.CupTool })))
+const EightTool = lazy(() => import('../tools/EightTool').then((m) => ({ default: m.EightTool })))
 const CardTool = lazy(() => import('../tools/CardTool').then((m) => ({ default: m.CardTool })))
 
 function ToolView({ tool }: { tool: ToolId }) {
@@ -45,6 +49,14 @@ function ToolView({ tool }: { tool: ToolId }) {
       return <RouletteTool />
     case 'satranc':
       return <ChessTool />
+    case 'cop':
+      return <StrawTool />
+    case 'sicak':
+      return <FuseTool />
+    case 'kutu':
+      return <CupTool />
+    case 'top8':
+      return <EightTool />
   }
 }
 
@@ -146,7 +158,7 @@ export function Board({ selected }: { selected: ToolId | null }) {
       <ToolHostContext.Provider value={host}>
         <div className={`board${open ? ' is-open' : ''}`}>
           <h1 className="sr-only">Şansa</h1>
-          <div className="board__grid">
+          <div className="board__grid" style={{ '--rows': Math.max(6, Math.ceil((TOOL_ORDER.length - 1) / 2)) } as CSSProperties}>
             {TOOL_ORDER.map((id) => {
               const isOpen = id === selected
               return (

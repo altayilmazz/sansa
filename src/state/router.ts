@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { isToolId, type ToolId } from './tools'
+import { isAvailableTool, type ToolId } from './tools'
 
 /**
  * Hash tabanlı yönlendirme: sunucu yapılandırması gerektirmez ve
@@ -9,7 +9,7 @@ export type Route = { name: 'home' } | { name: 'tool'; tool: ToolId } | { name: 
 
 export function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean)
-  if (parts[0] === 'arac' && isToolId(parts[1])) return { name: 'tool', tool: parts[1] }
+  if (parts[0] === 'arac' && isAvailableTool(parts[1])) return { name: 'tool', tool: parts[1] }
   if (parts[0] === 'gecmis') return { name: 'history' }
   if (parts[0] === 'ayarlar') return { name: 'settings' }
   return { name: 'home' }
