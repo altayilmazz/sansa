@@ -1922,3 +1922,33 @@ textarea.field {
   gap: 6px;
   justify-content: flex-end;
 }
+
+/* Geri sayım tarzı basamaklar */
+.roll {
+  display: inline-flex;
+  align-items: flex-start;
+  height: 1em;
+  line-height: 1;
+}
+.roll__digit {
+  display: inline-block;
+  width: 0.62em;
+  height: 1em;
+  overflow: hidden;
+  text-align: center;
+}
+.roll__col {
+  display: flex;
+  flex-direction: column;
+}
+.roll__col > span {
+  display: block;
+  height: 1em;
+  line-height: 1;
+}
+.roll__sign {
+  margin-right: 0.04em;
+}
+.numbers li {
+  line-height: 1;
+}

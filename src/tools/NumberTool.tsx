@@ -9,6 +9,39 @@ import { Button, Notice, Row, Stepper, Switch } from '../ui/controls'
 import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
+/** Geri sayım gibi yukarıdan aşağı akan tek basamak; son değer üstte durur. */
+function RollDigit({ d, dur, on }: { d: number; dur: number; on: boolean }) {
+  const len = Math.max(11, Math.round((dur * 26) / 10) * 10 + 1)
+  return (
+    <span className="roll__digit">
+      <motion.span
+        className="roll__col"
+        initial={on ? { y: `-${((len - 1) / len) * 100}%` } : false}
+        animate={{ y: 0 }}
+        transition={{ duration: dur, ease: [0.12, 0.75, 0.2, 1] }}
+      >
+        {Array.from({ length: len }, (_, k) => (
+          <span key={k}>{(d + k) % 10}</span>
+        ))}
+      </motion.span>
+    </span>
+  )
+}
+
+/** Birler basamağı önce durur, sonra onlar, yüzler… tümü en geç 1,5 saniyede. */
+function RollNumber({ n, on }: { n: number; on: boolean }) {
+  const s = String(Math.abs(n))
+  const step = Math.min(0.25, 0.9 / Math.max(s.length - 1, 1))
+  return (
+    <span className="roll" aria-hidden="true">
+      {n < 0 && <span className="roll__sign">−</span>}
+      {s.split('').map((c, i) => (
+        <RollDigit key={i} d={Number(c)} dur={0.6 + (s.length - 1 - i) * step} on={on} />
+      ))}
+    </span>
+  )
+}
+
 const isStr = (v: unknown): v is string => typeof v === 'string'
 const isNum = (v: unknown): v is number => typeof v === 'number'
 const isBool = (v: unknown): v is boolean => typeof v === 'boolean'
@@ -31,7 +64,6 @@ export function NumberTool() {
   const [count, setCount] = usePersistent('sayi:adet', 1, isNum)
   const [unique, setUnique] = usePersistent('sayi:tekrarsiz', true, isBool)
   const [result, setResult] = useState<number[] | null>(null)
-  const [shown, setShown] = useState<number[] | null>(null)
   const [round, setRound] = useState(0)
   const [live, setLive] = useState('')
   const { busy, run } = useBusy()
@@ -47,7 +79,6 @@ export function NumberTool() {
   useEffect(() => {
     if (!busy) {
       setResult(null)
-      setShown(null)
     }
   }, [minS, maxS, count, unique])
 
@@ -58,45 +89,41 @@ export function NumberTool() {
       const out = generate(min, max, count, unique)
       const key = uid()
       setLive('')
-      setResult(null)
       haptic(10)
       sfx.whoosh()
-      if (!reduced) {
-        for (let i = 0; i < 9; i++) {
-          setShown(Array.from({ length: count }, () => min + Math.floor(Math.random() * (max - min + 1))))
-          sfx.tick()
-          await wait(70 + i * 12)
-          if (!mounted.current) return
-        }
-      }
-      setShown(null)
       setResult(out)
       setRound((r) => r + 1)
+      // Rakamlar en geç 1,5 saniyede durur.
+      await wait(reduced ? 120 : 1500)
+      if (!mounted.current) return
       sfx.win()
       haptic(25)
       setLive(`Rastgele sayı${out.length > 1 ? 'lar' : ''}: ${out.join(', ')}.`)
       record(key, { tool: 'sayi', title: out.length === 1 ? String(out[0]) : out.join(', '), detail: `${min} ile ${max} arası${out.length > 1 ? `, ${out.length} sayı${unique ? ', tekrarsız' : ''}` : ''}` })
     })
 
-  const list = shown ?? result
+  const list = result
   const big = !list || list.length === 1
 
   const stage = (
     <>
       <div className="stage-body number-stage">
         <button type="button" className="object-hit number-hit" onClick={roll} disabled={busy || !check.ok} aria-label="Sayı üret">
-          <AnimatePresence mode="wait" initial={false}>
+          <AnimatePresence mode="popLayout" initial={false}>
             {list ? (
               <motion.ol
-                key={shown ? 'rolling' : `r${round}`}
-                className={`numbers${big ? ' numbers--big' : ''}${shown ? ' is-rolling' : ''}`}
-                initial={shown || reduced ? false : { opacity: 0, scale: 0.8 }}
+                key={`r${round}`}
+                className={`numbers${big ? ' numbers--big' : ''}`}
+                exit={{ opacity: 0, transition: { duration: 0 } }}
+                initial={false}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ type: 'spring', bounce: 0.35, duration: 0.5 }}
                 aria-hidden="true"
               >
                 {list.map((n, i) => (
-                  <li key={i}>{n}</li>
+                  <li key={i}>
+                    <RollNumber n={n} on={!reduced} />
+                  </li>
                 ))}
               </motion.ol>
             ) : (
@@ -151,7 +178,6 @@ export function NumberTool() {
         setMaxS('100')
         setCount(1)
         setResult(null)
-        setShown(null)
         setLive('Sıfırlandı.')
       }}
       resetDisabled={busy}
