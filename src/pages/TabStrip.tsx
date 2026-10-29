@@ -146,7 +146,7 @@ export function TabStrip({ selected, ring, setRing, render }: { selected: ToolId
           </div>
         )
       })}
-      <div className="strip__slot is-pin" style={{ transform: `translateX(${pin * 100}%)`, '--tint': TOOLS[selected].tint } as CSSProperties}>
+      <div className={`strip__slot is-pin${pin === 0 ? ' pin-l' : pin === SLOTS - 1 ? ' pin-r' : ''}`} style={{ transform: `translateX(${pin * 100}%)`, '--tint': TOOLS[selected].tint } as CSSProperties}>
         {render(selected, true)}
       </div>
     </div>

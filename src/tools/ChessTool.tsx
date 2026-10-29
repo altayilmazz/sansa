@@ -86,6 +86,7 @@ export function ChessTool() {
         <p className={`chess__status${winner ? ' is-over' : ''}`} aria-hidden="true">
           {winner ? `${NAME[winner]} kazandı!` : phase === 'prep' ? 'Hazırlanıyor…' : phase === 'play' ? 'Oynanıyor…' : 'Bir renk seç ve oyunu başlat'}
         </p>
+        <div className="chess-wrap">
         <div className="chess" role="img" aria-label="Satranç tahtası">
           {squares.map((sq) => {
             const r = Math.floor(sq / 8)
@@ -104,6 +105,15 @@ export function ChessTool() {
               </span>
             )
           })}
+        </div>
+        {winner && game && game.moves.length > 0 && (
+          <div key={`win-${game.moves.length}-${winner}`} className={`chess__win is-${winner}`} aria-hidden="true">
+            <span className={`pc ${winner === 'w' ? 'is-w' : 'is-b'}`}>
+              {GLYPH[game.boards[game.moves.length][game.moves[game.moves.length - 1].to].toUpperCase()]}
+              {TEXT}
+            </span>
+          </div>
+        )}
         </div>
         <p className="stage-hint" aria-hidden="true">
           {phase === 'play' ? `${ply} / ${game?.moves.length} hamle` : phase === 'done' ? `${game?.moves.length} hamlede mat` : ' '}

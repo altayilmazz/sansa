@@ -16,10 +16,8 @@ const CoinTool = lazy(() => import('../tools/CoinTool').then((m) => ({ default: 
 const DiceTool = lazy(() => import('../tools/DiceTool').then((m) => ({ default: m.DiceTool })))
 const MinesTool = lazy(() => import('../tools/MinesTool').then((m) => ({ default: m.MinesTool })))
 const NumberTool = lazy(() => import('../tools/NumberTool').then((m) => ({ default: m.NumberTool })))
-const BottleTool = lazy(() => import('../tools/BottleTool').then((m) => ({ default: m.BottleTool })))
 const FingerTool = lazy(() => import('../tools/FingerTool').then((m) => ({ default: m.FingerTool })))
 const RouletteTool = lazy(() => import('../tools/RouletteTool').then((m) => ({ default: m.RouletteTool })))
-const RaceTool = lazy(() => import('../tools/RaceTool').then((m) => ({ default: m.RaceTool })))
 const ChessTool = lazy(() => import('../tools/ChessTool').then((m) => ({ default: m.ChessTool })))
 const CardTool = lazy(() => import('../tools/CardTool').then((m) => ({ default: m.CardTool })))
 
@@ -41,14 +39,10 @@ function ToolView({ tool }: { tool: ToolId }) {
       return <MinesTool />
     case 'sayi':
       return <NumberTool />
-    case 'sise':
-      return <BottleTool />
     case 'parmak':
       return <FingerTool />
     case 'rulet':
       return <RouletteTool />
-    case 'yaris':
-      return <RaceTool />
     case 'satranc':
       return <ChessTool />
   }

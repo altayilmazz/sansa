@@ -92,12 +92,6 @@ export function ToolGlyph({ tool, size = 28 }: { tool: ToolId; size?: number }) 
           </text>
         </g>
       )}
-      {tool === 'sise' && (
-        <g transform="rotate(35 16 16)">
-          <path d="M13.5 2h5v4c0 2 .6 3 1.8 5 1.6 2.4 2.7 4 2.7 7v8a3 3 0 0 1-3 3h-8a3 3 0 0 1-3-3v-8c0-3 1.1-4.6 2.7-7C12.9 9 13.5 8 13.5 6z" style={f('b1')} />
-          <rect x="12" y="19" width="8" height="7" rx="1.5" style={f('b2')} />
-        </g>
-      )}
       {tool === 'parmak' && (
         <g>
           {[
@@ -120,16 +114,6 @@ export function ToolGlyph({ tool, size = 28 }: { tool: ToolId; size?: number }) 
             const a = (i * 60 * Math.PI) / 180
             return <circle key={i} cx={16 + 8 * Math.sin(a)} cy={16 - 8 * Math.cos(a)} r="2.6" style={f(i === 0 ? 'u2' : 'c0')} opacity={i === 0 ? 1 : 0.9} />
           })}
-        </g>
-      )}
-      {tool === 'yaris' && (
-        <g>
-          <rect x="3" y="6" width="26" height="6" rx="3" style={f('h2')} opacity="0.35" />
-          <rect x="3" y="14" width="26" height="6" rx="3" style={f('h2')} opacity="0.35" />
-          <rect x="3" y="22" width="26" height="6" rx="3" style={f('h2')} opacity="0.35" />
-          <circle cx="22" cy="9" r="3.4" style={f('h1')} />
-          <circle cx="14" cy="17" r="3.4" style={f('h2')} />
-          <circle cx="9" cy="25" r="3.4" style={f('h1')} />
         </g>
       )}
       {tool === 'satranc' && (

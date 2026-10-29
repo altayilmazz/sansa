@@ -273,8 +273,14 @@
     min-height: 0;
   }
   /* Seçili sekme panelle birleşir: üst kenarı yok, panelin alt çizgisini örter. */
+  .strip__slot.is-pin.pin-l .block--tile {
+    left: 0;
+  }
+  .strip__slot.is-pin.pin-r .block--tile {
+    right: 0;
+  }
   .strip__slot.is-pin .block--tile {
-    top: -9px;
+    top: -10px;
     border-top-width: 0;
     border-color: var(--hairline-strong);
     box-shadow: inset 0 -2px 0 var(--tint);
@@ -288,7 +294,7 @@
   }
   .board.is-open .is-selected .tile__link {
     /* sekme 9 px yukarı uzadığı için içerik diğerleriyle aynı hizada kalsın */
-    padding: 17px 2px 8px;
+    padding: 18px 2px 8px;
   }
   .board.is-open .tile__art {
     --glyph: 26px;

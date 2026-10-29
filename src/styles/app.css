@@ -1955,52 +1955,6 @@ textarea.field {
   line-height: 1;
 }
 
-/* Şişe çevirmece */
-.bottle-stage {
-  --bottle: var(--accent);
-}
-.bottle-hit {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: min(100%, 340px);
-  aspect-ratio: 1;
-  background: none;
-  border: 0;
-}
-.bottle {
-  width: 34%;
-  overflow: visible;
-  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.35));
-}
-.bottle__body {
-  fill: var(--bottle);
-}
-.bottle__cap {
-  fill: color-mix(in srgb, var(--bottle) 45%, #000);
-}
-.bottle__label {
-  fill: rgba(255, 255, 255, 0.82);
-}
-.bottle__shine {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.35);
-  stroke-width: 3;
-  stroke-linecap: round;
-}
-.bottle__mark {
-  position: absolute;
-  inset: 4%;
-  border-radius: 50%;
-  border: 2px dashed var(--hairline-strong);
-  opacity: 0.6;
-  transition: border-color 0.3s, opacity 0.3s;
-}
-.bottle__mark.is-on {
-  border-color: var(--accent);
-  opacity: 1;
-}
-
 /* Parmak seçici */
 .finger-field {
   position: relative;
@@ -2130,14 +2084,6 @@ textarea.field {
   font-size: 30px;
 }
 
-/* At yarışı */
-.stage-body.race-stage {
-  gap: 10px;
-  align-items: stretch;
-  justify-content: flex-start;
-  padding-top: 38px;
-}
-.race__status,
 .chess__status {
   text-align: center;
   font-size: var(--fs-callout);
@@ -2147,87 +2093,23 @@ textarea.field {
 .chess__status.is-over {
   color: var(--ink);
 }
-.race {
-  position: relative;
-  width: 100%;
-  flex: 1;
-  min-height: 160px;
-  max-height: 440px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: repeat(var(--n), minmax(0, 1fr));
-  gap: 6px;
-}
-.race__finish {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 10px;
-  border-radius: 4px;
-  background: repeating-conic-gradient(var(--ink) 0 25%, transparent 0 50%) 0 0 / 10px 10px;
-  opacity: 0.55;
-}
-.lane {
-  position: relative;
-  min-height: 0;
-  padding-right: 16px;
-  border-radius: 12px;
-  background: var(--surface-2);
-  transition: box-shadow 0.3s, background-color 0.3s;
-}
-.lane.is-marked {
-  box-shadow: inset 0 0 0 1.5px var(--ink-3);
-}
-.lane.is-win {
-  background: color-mix(in srgb, var(--accent) 22%, var(--surface-2));
-  box-shadow: inset 0 0 0 2px var(--accent), 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
-}
-.lane__track {
-  position: relative;
-  height: 100%;
-  margin-right: 34px;
-}
-.horse {
-  position: absolute;
-  top: 50%;
-  height: min(32px, 86%);
-  aspect-ratio: 1;
-  transform: translateY(-50%);
-}
-.horse__btn {
-  width: 100%;
-  height: 100%;
-  border: 0;
-  border-radius: 50%;
-  background: var(--c);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 800;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-  touch-action: manipulation;
-}
-.lane.is-marked .horse__btn {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-}
-.race__podium {
-  text-align: center;
-  font-size: var(--fs-sub);
-  color: var(--ink-2);
-}
 
 /* Hızlı satranç */
 .chess-stage {
   gap: 10px;
 }
+.chess-wrap {
+  position: relative;
+  width: min(100%, 360px, calc(100dvh - 380px));
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
 .chess {
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
   grid-template-rows: repeat(8, minmax(0, 1fr));
-  width: min(100%, 360px, calc(100dvh - 380px));
-  aspect-ratio: 1;
+  width: 100%;
+  height: 100%;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: var(--shadow-object);
@@ -2286,5 +2168,70 @@ textarea.field {
   }
   .board:not(.is-open) .tile__art {
     --glyph: 44px;
+  }
+}
+
+/* Kazanan taş: tahtanın ortasında, kenarları neon parlar */
+.chess__win {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  animation: chess-win-in 0.55s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+}
+.chess__win::before {
+  content: '';
+  position: absolute;
+  width: 42%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.62) 0 55%, transparent 72%);
+}
+.chess__win .pc {
+  position: relative;
+  font-size: 26cqw;
+  line-height: 1;
+}
+.chess__win.is-w .pc {
+  color: #ffffff;
+  -webkit-text-stroke: 1px #7df9ff;
+  text-shadow: 0 0 4px #fff, 0 0 12px #5ef0ff, 0 0 26px #1ec8ff, 0 0 46px #1ec8ff;
+}
+.chess__win.is-b .pc {
+  color: #0b0b10;
+  -webkit-text-stroke: 1.5px #ff8cff;
+  text-shadow: 0 0 3px #ff9cff, 0 0 12px #ff3dff, 0 0 26px #c400ff, 0 0 46px #c400ff;
+}
+@keyframes chess-win-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* Ana ekran (dar): logo ve isim kutunun ortasında */
+@media (max-width: 859px) {
+  .board:not(.is-open) .board__grid .tile__link {
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 6px;
+    text-align: center;
+  }
+  .board:not(.is-open) .board__grid .tile__text {
+    padding-right: 0;
+    max-width: 100%;
+  }
+  .board:not(.is-open) .board__grid .tile__name {
+    font-size: 14px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  .board:not(.is-open) .board__grid .tile__art {
+    --glyph: 42px;
+  }
+  .board:not(.is-open) .board__grid .block {
+    min-height: clamp(104px, 15dvh, 200px);
   }
 }

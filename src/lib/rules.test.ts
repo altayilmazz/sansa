@@ -10,7 +10,6 @@ import { diceOutcome, rollDice } from './rules/dice'
 import { clampMines, maxMines, newGame, reveal, safeLeft } from './rules/mines'
 import { checkRange, generate } from './rules/number'
 import { legalMoves, perft, playRandomGame, START } from './rules/chess'
-import { MAX_HORSES, planRace } from './rules/race'
 import { load, pull } from './rules/roulette'
 import { cardOutcome, Deck, fullDeck, type Card } from './rules/cards'
 
@@ -335,32 +334,6 @@ describe('satranç', () => {
       expect(legalMoves(g.boards[i], turn).some((x) => x.from === m.from && x.to === m.to)).toBe(true)
     })
     expect(['w', 'b', 'draw']).toContain(g.result)
-  })
-})
-
-describe('at yarışı', () => {
-  it('bitiş sırası ve süreler tutarlıdır', () => {
-    for (let n = 3; n <= MAX_HORSES; n++) {
-      const p = planRace(n)
-      expect(new Set(p.order).size).toBe(n)
-      for (let r = 1; r < n; r++) expect(p.durations[p.order[r]]).toBeGreaterThan(p.durations[p.order[r - 1]])
-      p.paths.forEach((path) => {
-        expect(path.x[0]).toBe(0)
-        expect(path.x[path.x.length - 1]).toBe(1)
-        for (let i = 1; i < path.x.length; i++) {
-          expect(path.x[i]).toBeGreaterThan(path.x[i - 1])
-          expect(path.times[i]).toBeGreaterThan(path.times[i - 1])
-        }
-      })
-    }
-  })
-  it('her at kazanma şansı eşittir', () => {
-    const wins = new Array(4).fill(0)
-    for (let i = 0; i < 2000; i++) wins[planRace(4).order[0]]++
-    wins.forEach((w) => {
-      expect(w).toBeGreaterThan(380)
-      expect(w).toBeLessThan(620)
-    })
   })
 })
 

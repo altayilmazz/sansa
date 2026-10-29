@@ -46,9 +46,9 @@ export interface HistoryItem {
   detail: string
   at: number
 }
-const isHistory = (v: unknown): v is HistoryItem[] =>
-  Array.isArray(v) &&
-  v.every((x) => isObj(x) && isStr(x.id) && isToolId(x.tool) && isStr(x.title) && isStr(x.detail) && typeof x.at === 'number')
+const isHistoryItem = (x: unknown): x is HistoryItem => isObj(x) && isStr(x.id) && isToolId(x.tool) && isStr(x.title) && isStr(x.detail) && typeof x.at === 'number'
+/** Kaldırılan araçların eski kayıtları süzülür; geçmişin geri kalanı korunur. */
+const isHistory = (v: unknown): v is HistoryItem[] => Array.isArray(v) && v.every((x) => isHistoryItem(x) || (isObj(x) && isStr(x.id) && isStr(x.tool)))
 
 export const HISTORY_LIMIT = 40
 export const SAVED_LIST_LIMIT = 20
@@ -70,7 +70,7 @@ const Ctx = createContext<Store | null>(null)
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [settings, setSettingsState] = useState(loadSettings)
   const [savedLists, setSavedLists] = useState(() => load('lists', [] as SavedList[], isSavedLists))
-  const [history, setHistory] = useState(() => load('history', [] as HistoryItem[], isHistory))
+  const [history, setHistory] = useState(() => load('history', [] as HistoryItem[], isHistory).filter(isHistoryItem))
   const recorded = useRef(new Set<string>())
 
   useEffect(() => void save('settings', settings), [settings])
