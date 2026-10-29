@@ -54,4 +54,4 @@ export function makeTeams<T>(people: readonly T[], teamCount: number, rng: Rng =
   return teams
 }
 
-export const TEAM_NAMES = ['Kırmızılar', 'Maviler', 'Yeşiller', 'Sarılar', 'Turuncular', 'Morlar', 'Beyazlar', 'Grililer']
+export const TEAM_NAMES = ['1. Takım', '2. Takım', '3. Takım', '4. Takım', '5. Takım', '6. Takım', '7. Takım', '8. Takım']

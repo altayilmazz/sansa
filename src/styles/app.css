@@ -888,6 +888,7 @@ textarea.field {
   height: 10px;
   border-radius: 50%;
   background: var(--team);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 35%, transparent);
   flex: none;
 }
 .team__name {
@@ -2184,14 +2185,16 @@ textarea.field {
   position: relative;
   font-size: 26cqw;
   line-height: 1;
-  -webkit-text-stroke: 1.5px #ffffff;
-  text-shadow: 0 0 4px #fff, 0 0 12px #fff, 0 0 26px rgba(255, 255, 255, 0.8);
 }
 .chess__win.is-w .pc {
   color: #ffffff;
+  -webkit-text-stroke: 1.5px #ffffff;
+  text-shadow: 0 0 4px #fff, 0 0 13px #fff, 0 0 29px #fff, 0 0 42px rgba(255, 255, 255, 0.9);
 }
 .chess__win.is-b .pc {
-  color: #0b0b10;
+  color: #000000;
+  -webkit-text-stroke: 1.5px #000000;
+  text-shadow: 0 0 4px #000, 0 0 13px #000, 0 0 29px #000, 0 0 42px rgba(0, 0, 0, 0.9);
 }
 @keyframes chess-win-in {
   from {
