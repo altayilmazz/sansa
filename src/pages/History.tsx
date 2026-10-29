@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { HISTORY_LIMIT, useStore } from '../state/store'
 import { TOOLS } from '../state/tools'
 import { ToolGlyph } from '../objects/ToolGlyph'
-import { Button } from '../ui/controls'
+import { Button, IconButton } from '../ui/controls'
 import { fullTime, relativeTime } from '../ui/time'
 
 export function History() {
@@ -10,10 +10,30 @@ export function History() {
   const [confirm, setConfirm] = useState(false)
   return (
     <div className="page">
-      <header className="page__head">
-        <h1 className="largetitle">Geçmiş</h1>
-        <p className="page__lede">Bu cihazda tamamlanan son {HISTORY_LIMIT} tur saklanır.</p>
+      <header className="page__head page__head--row">
+        <div>
+          <h1 className="largetitle">Geçmiş</h1>
+          <p className="page__lede">Bu cihazda tamamlanan son {HISTORY_LIMIT} tur saklanır.</p>
+        </div>
+        <IconButton icon="trash" label="Geçmişi temizle" disabled={history.length === 0} onClick={() => setConfirm(true)} />
       </header>
+      {confirm && history.length > 0 && (
+        <div className="confirm" role="group" aria-label="Geçmişi temizlemeyi onayla">
+          <span>Tüm geçmiş silinsin mi?</span>
+          <Button variant="plain" onClick={() => setConfirm(false)}>
+            Vazgeç
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => {
+              clearHistory()
+              setConfirm(false)
+            }}
+          >
+            Geçmişi sil
+          </Button>
+        </div>
+      )}
       {history.length === 0 ? (
         <p className="empty">Henüz tamamlanmış bir tur yok. Bir aracı kullandığında sonuçlar burada listelenir.</p>
       ) : (
@@ -37,29 +57,6 @@ export function History() {
               </li>
             ))}
           </ol>
-          <div className="page__foot">
-            {confirm ? (
-              <div className="confirm" role="group" aria-label="Geçmişi temizlemeyi onayla">
-                <span>Tüm geçmiş silinsin mi?</span>
-                <Button variant="plain" onClick={() => setConfirm(false)}>
-                  Vazgeç
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    clearHistory()
-                    setConfirm(false)
-                  }}
-                >
-                  Geçmişi sil
-                </Button>
-              </div>
-            ) : (
-              <Button variant="plain" icon="trash" onClick={() => setConfirm(true)}>
-                Geçmişi temizle
-              </Button>
-            )}
-          </div>
         </>
       )}
     </div>

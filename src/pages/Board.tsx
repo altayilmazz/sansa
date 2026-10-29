@@ -6,7 +6,6 @@ import { setPendingExample, type Example } from '../state/examples'
 import { href } from '../state/router'
 import { TOOL_ORDER, TOOLS, type ToolId } from '../state/tools'
 import { TeamsTool } from '../tools/TeamsTool'
-import { BrandMark } from '../ui/Brand'
 import { Icon } from '../ui/Icon'
 import { ToolHostContext } from '../ui/ToolHost'
 
@@ -71,23 +70,6 @@ function TileFace({ id, selected }: { id: ToolId; selected?: boolean }) {
         <Icon name="chevronRight" size={18} />
       </span>
     </a>
-  )
-}
-
-/** Araç açıkken içeriğin altında: sol altta Şansa, tam ortada "Ana sayfa" düğmesi. */
-function BoardFoot() {
-  return (
-    <nav className="board__foot" aria-label="Gezinme">
-      <span className="foot__brand">
-        <BrandMark />
-        Şansa
-      </span>
-      <a className="btn btn--secondary foot__home" href={href({ name: 'home' })}>
-        <Icon name="home" size={18} />
-        <span>Ana sayfa</span>
-      </a>
-      <span aria-hidden="true" />
-    </nav>
   )
 }
 
@@ -186,7 +168,6 @@ export function Board({ selected }: { selected: ToolId | null }) {
                 </motion.section>
               )
             })}
-            {open && <BoardFoot />}
           </div>
         </div>
       </ToolHostContext.Provider>
@@ -255,7 +236,6 @@ export function Board({ selected }: { selected: ToolId | null }) {
               </motion.section>
             )}
           </AnimatePresence>
-          {open && <BoardFoot />}
         </div>
       </div>
     </ToolHostContext.Provider>

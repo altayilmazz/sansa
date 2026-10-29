@@ -65,6 +65,14 @@ const paths = {
     </>
   ),
   crown: <path d="M4 18.5h16M4.5 17L3 8l5 4 4-7 4 7 5-4-1.5 9z" />,
+  grid: (
+    <>
+      <rect x="4" y="4" width="6.5" height="6.5" rx="1.6" />
+      <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" />
+      <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" />
+      <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" />
+    </>
+  ),
   undo: <path d="M9 14L4 9l5-5M4 9h10a6 6 0 010 12h-3" />,
 } as const
 

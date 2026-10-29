@@ -10,33 +10,34 @@ import { useStore } from './state/store'
 import { applyTheme, resolveTheme } from './state/theme'
 import { TOOLS } from './state/tools'
 import { BrandMark } from './ui/Brand'
+import { Icon, type IconName } from './ui/Icon'
 
-const LINKS: { route: Route; label: string }[] = [
-  { route: { name: 'home' }, label: 'Araçlar' },
-  { route: { name: 'history' }, label: 'Geçmiş' },
-  { route: { name: 'settings' }, label: 'Ayarlar' },
+const LINKS: { route: Route; label: string; icon: IconName }[] = [
+  { route: { name: 'home' }, label: 'Araçlar', icon: 'grid' },
+  { route: { name: 'history' }, label: 'Geçmiş', icon: 'clock' },
+  { route: { name: 'settings' }, label: 'Ayarlar', icon: 'gear' },
 ]
 
-function SiteNav({ route }: { route: Route }) {
+/** Altta sabit gezinme: solda ana sayfa (logo), sağda araçlar, geçmiş ve ayarlar. */
+function Dock({ route }: { route: Route }) {
   return (
-    <header className="sitenav">
-      <nav className="sitenav__inner" aria-label="Ana gezinme">
-        <a className="sitenav__brand" href={href({ name: 'home' })}>
-          <BrandMark />
-          Şansa
+    <nav className="dock" aria-label="Ana gezinme">
+      <div className="dock__inner">
+        <a className="dock__btn dock__home" href={href({ name: 'home' })} aria-label="Ana sayfa" title="Ana sayfa">
+          <BrandMark size={26} />
         </a>
-        <div className="sitenav__links">
+        <div className="dock__links">
           {LINKS.map((l) => {
-            const on = l.route.name === route.name
+            const on = l.route.name === 'home' ? route.name === 'home' || route.name === 'tool' : l.route.name === route.name
             return (
-              <a key={l.label} className="sitenav__link" href={href(l.route)} aria-current={on ? 'page' : undefined}>
-                {l.label}
+              <a key={l.label} className={`dock__btn${on ? ' is-on' : ''}`} href={href(l.route)} aria-label={l.label} title={l.label} aria-current={on ? 'page' : undefined}>
+                <Icon name={l.icon} size={21} />
               </a>
             )
           })}
         </div>
-      </nav>
-    </header>
+      </div>
+    </nav>
   )
 }
 
@@ -68,7 +69,7 @@ export function App() {
   }, [hash])
 
   const onBoard = route.name === 'home' || route.name === 'tool'
-  // Araç açıkken üst çubuk yoktur: içerik ekranı doldurur, gezinme alttaki satırdadır.
+  // Araç açıkken içerik ekranı doldurur; gezinme her sayfada alttaki dock'tadır.
   const inTool = route.name === 'tool'
 
   return (
@@ -78,12 +79,12 @@ export function App() {
       <a className="skip" href="#icerik">
         İçeriğe geç
       </a>
-      {!inTool && <SiteNav route={route} />}
       <main id="icerik" className={`main${inTool ? ' is-tool' : ''}`}>
         {onBoard && <Board selected={route.name === 'tool' ? route.tool : null} />}
         {route.name === 'history' && <History />}
         {route.name === 'settings' && <Settings />}
       </main>
+      <Dock route={route} />
     </MotionConfig>
   )
 }
