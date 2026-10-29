@@ -2180,28 +2180,18 @@ textarea.field {
   pointer-events: none;
   animation: chess-win-in 0.55s cubic-bezier(0.2, 1.2, 0.3, 1) both;
 }
-.chess__win::before {
-  content: '';
-  position: absolute;
-  width: 42%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 0, 0, 0.62) 0 55%, transparent 72%);
-}
 .chess__win .pc {
   position: relative;
   font-size: 26cqw;
   line-height: 1;
+  -webkit-text-stroke: 1.5px #ffffff;
+  text-shadow: 0 0 4px #fff, 0 0 12px #fff, 0 0 26px rgba(255, 255, 255, 0.8);
 }
 .chess__win.is-w .pc {
   color: #ffffff;
-  -webkit-text-stroke: 1px #7df9ff;
-  text-shadow: 0 0 4px #fff, 0 0 12px #5ef0ff, 0 0 26px #1ec8ff, 0 0 46px #1ec8ff;
 }
 .chess__win.is-b .pc {
   color: #0b0b10;
-  -webkit-text-stroke: 1.5px #ff8cff;
-  text-shadow: 0 0 3px #ff9cff, 0 0 12px #ff3dff, 0 0 26px #c400ff, 0 0 46px #c400ff;
 }
 @keyframes chess-win-in {
   from {
