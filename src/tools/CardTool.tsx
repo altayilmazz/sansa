@@ -61,7 +61,7 @@ export function CardTool() {
   const { busy, run } = useBusy()
   const reduced = useReducedMotion()
   const mounted = useMounted()
-  const { record, announce } = useStore()
+  const { record } = useStore()
   const matchKey = useRef(uid())
 
   const isMatch = mode === 'mac'
@@ -90,7 +90,6 @@ export function CardTool() {
         sfx.reveal()
         setLive(`Çekilen kart: ${cardName(card)}. Destede ${deck.current.remaining} kart kaldı.`)
         record(uid(), { tool: 'kart', title: cardName(card), detail: `Tek kart · destede ${deck.current.remaining} kart kaldı` })
-        announce({ tool: 'kart', headline: cardName(card), detail: `Destede ${deck.current.remaining} kart` })
         return
       }
       const side: Side = pair.a ? 'b' : 'a'
@@ -121,7 +120,6 @@ export function CardTool() {
           title: `${w} kazandı`,
           detail: `${match.names[0]}: ${cardName(a)} – ${match.names[1]}: ${cardName(card)}${match.format === 'ucte-iki' ? ` · 3’te 2, ${score.a}–${score.b}` : ''}`,
         })
-        announce({ tool: 'kart', headline: `${w} kazandı`, detail: `${cardName(a)} – ${cardName(card)}` })
       } else {
         setLive(`${match.names[0]} ${cardName(a)}, ${match.names[1]} ${cardName(card)}. Turu ${nameOf(match, o)} aldı. Skor ${score.a}–${score.b}.`)
       }

@@ -1,8 +1,6 @@
 import { MotionConfig } from 'motion/react'
 import { useEffect } from 'react'
-import { DynamicIsland } from './features/island'
 import { setSoundEnabled } from './features/sound'
-import { SquirrelChaser } from './features/SquirrelChaser'
 import { Board } from './pages/Board'
 import { History } from './pages/History'
 import { Settings } from './pages/Settings'
@@ -10,29 +8,13 @@ import { useReducedMotion } from './state/hooks'
 import { href, parseRoute, useHash, type Route } from './state/router'
 import { useStore } from './state/store'
 import { TOOLS } from './state/tools'
+import { BrandMark } from './ui/Brand'
 
 const LINKS: { route: Route; label: string }[] = [
   { route: { name: 'home' }, label: 'Araçlar' },
   { route: { name: 'history' }, label: 'Geçmiş' },
   { route: { name: 'settings' }, label: 'Ayarlar' },
 ]
-
-/** Araç sayfaları da "Araçlar" bağlantısını etkin gösterir. */
-function isActive(current: Route, r: Route) {
-  if (r.name === 'home') return current.name === 'home' || current.name === 'tool'
-  return current.name === r.name
-}
-
-function BrandMark() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <rect x="2" y="2" width="20" height="20" rx="6" fill="#efe9dc" />
-      <circle cx="8" cy="8" r="1.9" fill="#1d1d1f" />
-      <circle cx="16" cy="16" r="1.9" fill="#1d1d1f" />
-      <circle cx="12" cy="12" r="2" fill="#0071e3" />
-    </svg>
-  )
-}
 
 function SiteNav({ route }: { route: Route }) {
   return (
@@ -44,7 +26,7 @@ function SiteNav({ route }: { route: Route }) {
         </a>
         <div className="sitenav__links">
           {LINKS.map((l) => {
-            const on = isActive(route, l.route)
+            const on = l.route.name === route.name
             return (
               <a key={l.label} className="sitenav__link" href={href(l.route)} aria-current={on ? 'page' : undefined}>
                 {l.label}
@@ -82,6 +64,8 @@ export function App() {
   }, [hash])
 
   const onBoard = route.name === 'home' || route.name === 'tool'
+  // Araç açıkken üst çubuk yoktur: içerik ekranı doldurur, gezinme alttaki satırdadır.
+  const inTool = route.name === 'tool'
 
   return (
     // Hareket azaltma her bileşende açıkça ele alınır; Motion'ın otomatik kısması
@@ -90,14 +74,12 @@ export function App() {
       <a className="skip" href="#icerik">
         İçeriğe geç
       </a>
-      <SiteNav route={route} />
-      <main id="icerik" className="main">
+      {!inTool && <SiteNav route={route} />}
+      <main id="icerik" className={`main${inTool ? ' is-tool' : ''}`}>
         {onBoard && <Board selected={route.name === 'tool' ? route.tool : null} />}
         {route.name === 'history' && <History />}
         {route.name === 'settings' && <Settings />}
       </main>
-      <DynamicIsland />
-      <SquirrelChaser />
     </MotionConfig>
   )
 }

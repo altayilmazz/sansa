@@ -5,34 +5,21 @@ import { isEntryList, isObj, isStr, load, save } from '../lib/storage'
 import { isToolId, type ToolId } from './tools'
 
 export type MotionPref = 'sistem' | 'azalt' | 'tam'
-export type IslandPref = 'otomatik' | 'her-zaman' | 'kapali'
 
 export interface Settings {
   sound: boolean
   motion: MotionPref
-  island: IslandPref
-  squirrel: boolean
-  /** Ayar şeması sürümü; eski kayıtları bir kez taşımak için. */
-  v?: number
 }
 
-const SETTINGS_VERSION = 2
+export const DEFAULT_SETTINGS: Settings = { sound: false, motion: 'sistem' }
 
-export const DEFAULT_SETTINGS: Settings = { sound: false, motion: 'sistem', island: 'otomatik', squirrel: false, v: SETTINGS_VERSION }
+const isSettings = (v: unknown): v is Settings => isObj(v) && typeof v.sound === 'boolean' && ['sistem', 'azalt', 'tam'].includes(v.motion as string)
 
-/** Sürüm 2 öncesi kayıtlarda sincap varsayılan olarak açıktı; bir kez kapatılır, kullanıcı sonra açabilir. */
+/** Eski kayıtlarda artık kullanılmayan alanlar (ada, sincap) olabilir; yalnızca bilinenler alınır. */
 function loadSettings(): Settings {
-  const s = { ...DEFAULT_SETTINGS, ...load('settings', DEFAULT_SETTINGS, isSettings) }
-  return s.v === SETTINGS_VERSION ? s : { ...s, squirrel: false, v: SETTINGS_VERSION }
+  const s = load('settings', DEFAULT_SETTINGS, isSettings)
+  return { sound: s.sound, motion: s.motion }
 }
-
-const isSettings = (v: unknown): v is Settings =>
-  isObj(v) &&
-  typeof v.sound === 'boolean' &&
-  ['sistem', 'azalt', 'tam'].includes(v.motion as string) &&
-  ['otomatik', 'her-zaman', 'kapali'].includes(v.island as string) &&
-  typeof v.squirrel === 'boolean' &&
-  (v.v === undefined || typeof v.v === 'number')
 
 export interface SavedList {
   id: string
@@ -57,14 +44,6 @@ const isHistory = (v: unknown): v is HistoryItem[] =>
 export const HISTORY_LIMIT = 40
 export const SAVED_LIST_LIMIT = 20
 
-/** Sonucun ekranda ve Dinamik Ada'da açıklanması için anlık bildirim. */
-export interface Announcement {
-  key: string
-  tool: ToolId
-  headline: string
-  detail?: string
-}
-
 interface Store {
   settings: Settings
   setSettings: (patch: Partial<Settings>) => void
@@ -75,9 +54,6 @@ interface Store {
   /** Tur tamamlandığında bir kez çağrılır. Aynı roundKey ikinci kez kaydedilmez. */
   record: (roundKey: string, item: Omit<HistoryItem, 'id' | 'at'>) => void
   clearHistory: () => void
-  announcement: Announcement | null
-  announce: (a: Omit<Announcement, 'key'>) => void
-  dismissAnnouncement: () => void
 }
 
 const Ctx = createContext<Store | null>(null)
@@ -86,7 +62,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [settings, setSettingsState] = useState(loadSettings)
   const [savedLists, setSavedLists] = useState(() => load('lists', [] as SavedList[], isSavedLists))
   const [history, setHistory] = useState(() => load('history', [] as HistoryItem[], isHistory))
-  const [announcement, setAnnouncement] = useState<Announcement | null>(null)
   const recorded = useRef(new Set<string>())
 
   useEffect(() => void save('settings', settings), [settings])
@@ -111,12 +86,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [])
   const clearHistory = useCallback(() => setHistory([]), [])
 
-  const announce = useCallback((a: Omit<Announcement, 'key'>) => setAnnouncement({ ...a, key: uid() }), [])
-  const dismissAnnouncement = useCallback(() => setAnnouncement(null), [])
-
   const value = useMemo(
-    () => ({ settings, setSettings, savedLists, saveList, deleteList, history, record, clearHistory, announcement, announce, dismissAnnouncement }),
-    [settings, setSettings, savedLists, saveList, deleteList, history, record, clearHistory, announcement, announce, dismissAnnouncement],
+    () => ({ settings, setSettings, savedLists, saveList, deleteList, history, record, clearHistory }),
+    [settings, setSettings, savedLists, saveList, deleteList, history, record, clearHistory],
   )
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

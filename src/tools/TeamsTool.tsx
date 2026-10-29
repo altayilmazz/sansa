@@ -9,7 +9,7 @@ import { usePersistent, useStore } from '../state/store'
 import { isEntryList } from '../lib/storage'
 import { copyText } from '../ui/clipboard'
 import { Button, Group, Notice, Row, Stepper } from '../ui/controls'
-import { EntryEditor } from '../ui/EntryEditor'
+import { useEntryEditor } from '../ui/EntryEditor'
 import { useExample } from '../ui/ExampleBanner'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
@@ -27,7 +27,7 @@ export function TeamsTool() {
   const { busy, run } = useBusy()
   const reduced = useReducedMotion()
   const mounted = useMounted()
-  const { record, announce } = useStore()
+  const { record } = useStore()
 
   const banner = useExample('takim', (e) => {
     const prev = { entries, count }
@@ -74,18 +74,12 @@ export function TeamsTool() {
       if (!mounted.current) return
       setPhase('done')
       sfx.reveal()
-      const sizes = result.map((t) => t.length)
       const summary = result.map((t, i) => `${TEAM_NAMES[i]}: ${t.map((p) => p.name).join(', ')}`).join('. ')
       setLive(`Takımlar hazır. ${summary}.`)
       record(key, {
         tool: 'takim',
         title: `${count} takım, ${total} kişi`,
         detail: result.map((t, i) => `${TEAM_NAMES[i]}: ${t.map((p) => p.name).join(', ')}`).join('\n'),
-      })
-      announce({
-        tool: 'takim',
-        headline: 'Takımlar hazır',
-        detail: sizes.every((s) => s === sizes[0]) ? `${count} takım · ${sizes[0]}’er kişi` : `${count} takım · ${sizes.join('–')} kişi`,
       })
     })
 
@@ -160,10 +154,12 @@ export function TeamsTool() {
     </div>
   )
 
+  const editor = useEntryEditor({ entries: entries, onChange: setEntries, noun: 'kişi', placeholder: 'Ayşe, Mehmet, Can', disabled: busy })
+
   const controls = (
     <>
       <Group title="Kişiler" id="takim-kisiler">
-        <EntryEditor entries={entries} onChange={setEntries} noun="kişi" placeholder={'Ayşe, Mehmet, Can\nya da her satıra bir isim'} disabled={busy} />
+        {editor.body}
       </Group>
       <Group title="Takımlar" id="takim-ayar">
         <Row label="Takım sayısı" hint={plan.ok ? (plan.even ? `Her takımda ${plan.sizes[0]} kişi` : undefined) : undefined}>
@@ -204,6 +200,7 @@ export function TeamsTool() {
   return (
     <ToolScaffold
       tool="takim"
+      topBar={editor.adder}
       stage={stage}
       controls={controls}
       action={action}

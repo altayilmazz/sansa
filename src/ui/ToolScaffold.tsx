@@ -1,9 +1,9 @@
-import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { navigate } from '../state/router'
 import { TOOLS, type ToolId } from '../state/tools'
 import { ToolGlyph } from '../objects/ToolGlyph'
 import { IconButton } from './controls'
-import { Icon } from './Icon'
+import { Sheet } from './Sheet'
 import { ExampleChips } from './ToolHost'
 
 interface Props {
@@ -16,11 +16,14 @@ interface Props {
   /** Ekran okuyucular için sonuç metni; sonuç kesinleştiğinde dolar. */
   live: string
   banner?: ReactNode
+  /** Sahnenin üstünde duran tek satırlık bölüm (ör. kişi/seçenek ekleme çubuğu). */
+  topBar?: ReactNode
 }
 
-export function ToolScaffold({ tool, stage, controls, action, rules, live, banner }: Props) {
+export function ToolScaffold({ tool, stage, controls, action, rules, live, banner, topBar }: Props) {
   const meta = TOOLS[tool]
   const title = useRef<HTMLHeadingElement>(null)
+  const [info, setInfo] = useState(false)
 
   // Pencere açılınca başlığa odaklan: klavye ve ekran okuyucu yeni içeriği bulur.
   useEffect(() => {
@@ -29,6 +32,7 @@ export function ToolScaffold({ tool, stage, controls, action, rules, live, banne
 
   return (
     <div className="tool" style={{ '--tint': meta.tint } as CSSProperties}>
+      {/* Dar ekranda başlık görünmez (seçili sekme zaten gösterir) ama ekran okuyucu için durur. */}
       <header className="tool__head">
         <div className="tool__title-wrap">
           <span className="tool__glyph" aria-hidden="true">
@@ -38,9 +42,10 @@ export function ToolScaffold({ tool, stage, controls, action, rules, live, banne
             {meta.name}
           </h1>
         </div>
-        <ExampleChips tool={tool} />
         <IconButton className="tool__close" icon="close" label={`${meta.name} penceresini kapat`} onClick={() => navigate({ name: 'home' })} />
       </header>
+
+      {topBar && <div className="tool__top">{topBar}</div>}
 
       <section className="tool__stage" aria-label="Sahne">
         {stage}
@@ -48,24 +53,29 @@ export function ToolScaffold({ tool, stage, controls, action, rules, live, banne
 
       <div className="tool__panel">
         {banner}
-        <details className="rules" open>
-          <summary className="rules__summary">
-            <Icon name="info" size={16} />
-            <span>Kurallar</span>
-            <Icon name="chevronRight" size={16} className="rules__chev" />
-          </summary>
-          <ul className="rules__list">
-            {rules.map((r) => (
-              <li key={r}>{r}</li>
-            ))}
-          </ul>
-        </details>
         {controls}
       </div>
 
       <div className="actionbar">
-        <div className="actionbar__inner">{action}</div>
+        <div className="actionbar__inner">
+          <IconButton className="actionbar__info" icon="info" label="Kurallar ve örnekler" onClick={() => setInfo(true)} />
+          {action}
+        </div>
       </div>
+
+      <Sheet open={info} onClose={() => setInfo(false)} title={meta.name}>
+        <section className="info" aria-labelledby={`info-rules-${tool}`}>
+          <h3 className="info__title" id={`info-rules-${tool}`}>
+            Kurallar
+          </h3>
+          <ul className="info__rules">
+            {rules.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        </section>
+        <ExampleChips tool={tool} />
+      </Sheet>
 
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {live}

@@ -32,7 +32,7 @@ export function DiceTool() {
   const reduced = useReducedMotion()
   const mounted = useMounted()
   const wide = useMedia('(min-width: 560px)')
-  const { record, announce } = useStore()
+  const { record } = useStore()
   const matchKey = useRef(uid())
 
   const isMatch = mode === 'mac'
@@ -59,7 +59,6 @@ export function DiceTool() {
       if (!b) {
         setLive(`Zar: ${sumText(a)}.`)
         record(uid(), { tool: 'zar', title: count === 1 ? `${a[0]}` : `Toplam ${total(a)}`, detail: count === 1 ? 'Tek zar' : `${a.join(' ve ')}` })
-        announce({ tool: 'zar', headline: count === 1 ? `${a[0]}` : `Toplam ${total(a)}`, detail: count === 2 ? a.join(' + ') : 'Tek zar' })
         sfx.reveal()
         return
       }
@@ -84,7 +83,6 @@ export function DiceTool() {
           title: `${w} kazandı`,
           detail: `${match.names[0]} – ${match.names[1]} · ${count} zar · ${match.format === 'tek' ? `toplam ${ta}–${tb}` : `3’te 2, ${score.a}–${score.b}`}`,
         })
-        announce({ tool: 'zar', headline: `${w} kazandı`, detail: match.format === 'tek' ? `${ta} – ${tb}` : `Skor ${score.a} – ${score.b}` })
         sfx.win()
       } else {
         setLive(`${match.names[0]} ${ta}, ${match.names[1]} ${tb}. Turu ${roundWinner} aldı. Skor ${score.a}–${score.b}.`)

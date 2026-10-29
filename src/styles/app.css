@@ -510,21 +510,12 @@ textarea.field {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 14px 16px 12px;
+  padding: 12px 16px 12px;
 }
 .editor__label {
   font-size: var(--fs-foot);
   color: var(--ink-2);
   font-weight: 500;
-}
-.editor__add {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-}
-.editor__input {
-  flex: 1;
-  min-width: 0;
 }
 .editor__hint {
   font-size: var(--fs-foot);
@@ -558,8 +549,6 @@ textarea.field {
   flex-direction: column;
   border-top: 0.5px solid var(--hairline);
   margin: 0 -16px -12px;
-  max-height: 420px;
-  overflow-y: auto;
 }
 .editor__item {
   display: flex;
@@ -1418,8 +1407,8 @@ textarea.field {
 
 /* ───────── Kartlar ───────── */
 .card-stage {
-  --cw: 86px;
-  --cw-table: 128px;
+  --cw: 80px;
+  --cw-table: 112px;
   --fan-step: calc(var(--cw) * 0.36);
 }
 .pcard {
@@ -1630,7 +1619,7 @@ textarea.field {
   position: relative;
   width: 100%;
   height: calc(var(--cw) * 1.62);
-  margin: 8px 0 30px;
+  margin: 4px 0 22px;
 }
 .fan__card {
   position: absolute;
@@ -1668,164 +1657,6 @@ textarea.field {
   color: var(--ink-3);
   text-align: center;
   max-width: 360px;
-}
-
-/* ───────── Dinamik Ada ───────── */
-.island-host {
-  position: fixed;
-  top: calc(var(--safe-top) + 10px);
-  left: 0;
-  right: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-}
-.island-host.is-docked {
-  top: 11px;
-}
-.island {
-  pointer-events: auto;
-  border: 0;
-  padding: 0;
-  background: #000;
-  color: #fff;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.12), 0 12px 30px rgba(0, 0, 0, 0.6);
-}
-.is-docked .island {
-  box-shadow: none;
-}
-.island__content {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  column-gap: 12px;
-  align-items: center;
-  width: 100%;
-  padding: 0 22px 0 18px;
-  text-align: left;
-}
-.island__glyph {
-  grid-row: 1 / span 3;
-  display: grid;
-  place-items: center;
-}
-.island__text {
-  display: contents;
-}
-.island__tool {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.55);
-  line-height: 1.2;
-}
-.island__headline {
-  font-size: 17px;
-  font-weight: 600;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.island__detail {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.25;
-}
-
-/* ───────── Sincap ───────── */
-.squirrel-lane {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 0;
-  z-index: 40;
-  pointer-events: none;
-}
-.squirrel {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 80px;
-  height: 64px;
-  will-change: transform;
-}
-.squirrel__fig {
-  width: 100%;
-  height: 100%;
-}
-.sq-svg {
-  display: block;
-  overflow: visible;
-  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.5));
-}
-.sq-head,
-.sq-leg,
-.sq-tail {
-  transform-box: fill-box;
-}
-.sq-head {
-  transform-origin: 20% 80%;
-  transition: transform 0.12s linear;
-}
-.sq-leg {
-  transform-origin: 50% 0%;
-}
-.sq-tail {
-  transform-origin: 90% 95%;
-}
-[data-state='run'] .sq-svg {
-  animation: sq-bob 0.22s ease-in-out infinite alternate;
-}
-[data-state='run'] .sq-leg--front {
-  animation: sq-leg 0.22s ease-in-out infinite alternate;
-}
-[data-state='run'] .sq-leg--back {
-  animation: sq-leg 0.22s ease-in-out infinite alternate-reverse;
-}
-[data-state='run'] .sq-tail {
-  animation: sq-tail-run 0.22s ease-in-out infinite alternate;
-}
-[data-state='look'] .sq-tail,
-[data-state='idle'] .sq-tail {
-  animation: sq-tail-idle 2.4s ease-in-out infinite alternate;
-}
-[data-state='jump'] .sq-tail {
-  transform: rotate(-18deg) scaleY(1.08);
-}
-[data-state='jump'] .sq-leg--front {
-  transform: rotate(-35deg);
-}
-[data-state='jump'] .sq-leg--back {
-  transform: rotate(30deg);
-}
-@keyframes sq-bob {
-  to {
-    transform: translateY(-3px);
-  }
-}
-@keyframes sq-leg {
-  from {
-    transform: rotate(-28deg);
-  }
-  to {
-    transform: rotate(28deg);
-  }
-}
-@keyframes sq-tail-run {
-  to {
-    transform: rotate(8deg);
-  }
-}
-@keyframes sq-tail-idle {
-  to {
-    transform: rotate(-6deg);
-  }
 }
 
 /* ───────── Hareketi azalt ───────── */

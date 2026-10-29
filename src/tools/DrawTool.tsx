@@ -8,7 +8,7 @@ import { haptic, sfx } from '../features/sound'
 import { useBusy, useMounted, useReducedMotion, wait } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { Button, Group, Notice, Row, Segmented, Stepper } from '../ui/controls'
-import { EntryEditor } from '../ui/EntryEditor'
+import { useEntryEditor } from '../ui/EntryEditor'
 import { useExample } from '../ui/ExampleBanner'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
@@ -19,7 +19,7 @@ const isIds = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => 
 export function DrawTool() {
   const [entries, setEntries] = usePersistent<Entry[]>('kura:list', [], isEntryList)
   const [count, setCount] = usePersistent('kura:count', 1, isNum)
-  const [mode, setMode] = usePersistent<RepeatMode>('kura:mode', 'tekrarsiz', isMode)
+  const [mode, setMode] = usePersistent<RepeatMode>('kura:mode2', 'tekrarsiz', isMode)
   const [drawnIds, setDrawnIds] = usePersistent<string[]>('kura:drawn', [], isIds)
   const [winners, setWinners] = useState<Entry[] | null>(null)
   const [phase, setPhase] = useState<'idle' | 'mix' | 'reveal' | 'done'>('idle')
@@ -28,7 +28,7 @@ export function DrawTool() {
   const { busy, run } = useBusy()
   const reduced = useReducedMotion()
   const mounted = useMounted()
-  const { record, announce } = useStore()
+  const { record } = useStore()
 
   const banner = useExample('kura', (e) => {
     const prev = { entries, count, drawnIds }
@@ -90,7 +90,6 @@ export function DrawTool() {
         title: result.length === 1 ? names[0] : `${result.length} kazanan`,
         detail: `${names.map((n, i) => (result.length > 1 ? `${i + 1}. ${n}` : n)).join(', ')} · ${poolSize} kayıt arasından${mode === 'tekrarsiz' ? ', tekrarsız' : ''}`,
       })
-      announce({ tool: 'kura', headline: names.length === 1 ? names[0] : names.slice(0, 3).join(', ') + (names.length > 3 ? '…' : ''), detail: `${poolSize} kayıt arasından` })
     })
 
   const resetPool = () => {
@@ -141,16 +140,18 @@ export function DrawTool() {
     </div>
   )
 
+  const editor = useEntryEditor({ entries: entries, onChange: setEntries, noun: 'kayıt', placeholder: 'Selin, Mert, Ece', disabled: busy })
+
   const controls = (
     <>
       <Group title="Liste" id="kura-liste">
-        <EntryEditor entries={entries} onChange={setEntries} noun="kayıt" placeholder={'Selin, Mert, Ece\nya da her satıra bir kayıt'} disabled={busy} />
+        {editor.body}
       </Group>
       <Group title="Çekiliş" id="kura-ayar">
-        <Row label="Kazanan sayısı" hint="Tek çekilişte aynı kayıt iki kez çıkmaz. Birden fazla kazananda çekiliş sırası sıralama olarak da kullanılabilir.">
+        <Row label="Kazanan sayısı">
           <Stepper value={Math.min(count, maxCount)} min={1} max={maxCount} onChange={setCount} label="Kazanan sayısı" disabled={busy || pool.length === 0} />
         </Row>
-        <Row label="Sonraki turlar" hint={mode === 'tekrarsiz' ? 'Çıkan kayıtlar sonraki turlarda yeniden çıkmaz.' : 'Her turda listenin tamamı yeniden çekilişe girer.'}>
+        <Row label="Sonraki turlar">
           <Segmented<RepeatMode>
             label="Sonraki turlar"
             value={mode}
@@ -188,6 +189,7 @@ export function DrawTool() {
   return (
     <ToolScaffold
       tool="kura"
+      topBar={editor.adder}
       stage={stage}
       controls={controls}
       action={action}
@@ -197,6 +199,7 @@ export function DrawTool() {
         'Havuzdaki her kaydın seçilme olasılığı eşittir.',
         'Bir çekilişte aynı kayıt birden fazla kez seçilmez.',
         'Kazanan sayısı havuzdaki kayıt sayısını geçemez.',
+        'Tekrarsızda çıkan kayıtlar sonraki turlarda yeniden çıkmaz; tekrarlıda her turda listenin tamamı çekilişe girer.',
       ]}
     />
   )

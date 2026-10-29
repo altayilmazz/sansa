@@ -26,7 +26,7 @@ export function CoinTool() {
   const { busy, run } = useBusy()
   const reduced = useReducedMotion()
   const mounted = useMounted()
-  const { record, announce } = useStore()
+  const { record } = useStore()
   const matchKey = useRef(uid())
 
   const banner = useExample('para', (e) => {
@@ -61,7 +61,6 @@ export function CoinTool() {
       if (!isMatch) {
         setLive(`Para düştü: ${label}.`)
         record(uid(), { tool: 'para', title: label, detail: 'Tek atış' })
-        announce({ tool: 'para', headline: label, detail: 'Tek atış' })
         return
       }
       const outcome = coinOutcome(result, aSide)
@@ -77,7 +76,6 @@ export function CoinTool() {
           title: `${w} kazandı`,
           detail: `${match.names[0]} (${sides[0]}) – ${match.names[1]} (${sides[1]})${match.format === 'ucte-iki' ? ` · 3’te 2 · ${score.a}–${score.b}` : ` · ${label}`}`,
         })
-        announce({ tool: 'para', headline: `${w} kazandı`, detail: `${label}${scoreText}` })
         sfx.win()
       } else {
         setRoundText(`Bu turu ${roundWinner} aldı · ${score.a}–${score.b}`)

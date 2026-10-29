@@ -1,14 +1,10 @@
-import { detectDynamicIsland } from '../features/island'
 import { sfx } from '../features/sound'
 import { storageAvailable } from '../lib/storage'
-import { useMedia } from '../state/hooks'
-import { HISTORY_LIMIT, useStore, type IslandPref, type MotionPref } from '../state/store'
-import { Button, Group, Row, Segmented, Switch } from '../ui/controls'
+import { HISTORY_LIMIT, useStore, type MotionPref } from '../state/store'
+import { Group, Row, Segmented, Switch } from '../ui/controls'
 
 export function Settings() {
-  const { settings, setSettings, announce } = useStore()
-  const island = detectDynamicIsland()
-  const finePointer = useMedia('(hover: hover) and (pointer: fine)')
+  const { settings, setSettings } = useStore()
   const stored = storageAvailable()
 
   return (
@@ -39,40 +35,6 @@ export function Settings() {
               { value: 'tam', label: 'Tam' },
             ]}
           />
-        </Row>
-      </Group>
-
-      <Group
-        title="Dinamik Ada"
-        id="ayar-ada"
-        footer={
-          island.likely
-            ? 'Bu cihazda Dinamik Ada bulunuyor gibi görünüyor. Kazanan, ekranın üstündeki adada da gösterilir.'
-            : 'Bu cihazda Dinamik Ada algılanmadı. İstersen sonucu ekranın üstünde ada biçiminde yine de gösterebilirsin.'
-        }
-      >
-        <Row label="Sonucu adada göster" hint="Algılama, ekran ölçüsü ve cihaz türüne dayalı bir tahmindir.">
-          <Segmented<IslandPref>
-            label="Dinamik Ada"
-            value={settings.island}
-            onChange={(v) => setSettings({ island: v })}
-            options={[
-              { value: 'otomatik', label: 'Otomatik' },
-              { value: 'her-zaman', label: 'Her zaman' },
-              { value: 'kapali', label: 'Kapalı' },
-            ]}
-          />
-        </Row>
-        <Row label="Önizle">
-          <Button variant="secondary" onClick={() => announce({ tool: 'kura', headline: 'Örnek bildirim', detail: 'Kazanan burada görünür' })}>
-            Göster
-          </Button>
-        </Row>
-      </Group>
-
-      <Group title="Masaüstü" id="ayar-masaustu" footer={finePointer ? undefined : 'Bu cihazda fare algılanmadığı için sincap gösterilmez.'}>
-        <Row label="İmleci kovalayan sincap" hint="Ekranın altında yürür, imlece bakar ve yaklaşınca zıplar.">
-          <Switch checked={settings.squirrel} label="İmleci kovalayan sincap" onChange={(v) => setSettings({ squirrel: v })} />
         </Row>
       </Group>
 

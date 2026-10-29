@@ -69,7 +69,7 @@ export function PlayersForm({ match, disabled, sideLabels, extra }: { match: Mat
         ))}
       </div>
       {extra}
-      <Row label="Biçim" hint={match.format === 'tek' ? 'Tek tur oynanır.' : 'İki turu ilk kazanan karşılaşmayı alır.'}>
+      <Row label="Biçim">
         <Segmented<MatchFormat>
           label="Karşılaşma biçimi"
           value={match.format}

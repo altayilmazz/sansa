@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { useId, useMemo, useRef, useState } from 'react'
+import { useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { addNames, duplicateKeys, normalize, type Entry } from '../lib/entries'
 import { useStore } from '../state/store'
 import { useReducedMotion } from '../state/hooks'
@@ -7,7 +7,7 @@ import { Button, IconButton, Notice } from './controls'
 import { Icon } from './Icon'
 import { Sheet } from './Sheet'
 
-interface Props {
+interface Options {
   entries: Entry[]
   onChange: (next: Entry[]) => void
   /** "kişi", "seçenek" gibi. */
@@ -19,19 +19,30 @@ interface Props {
   lists?: boolean
 }
 
-export function EntryEditor({ entries, onChange, noun, placeholder, disabled, max = 60, lists = true }: Props) {
+interface EntryEditor {
+  /** Tek satırlık ekleme çubuğu: aracın en üstüne yerleştirilir. */
+  adder: ReactNode
+  /** Sayaç, liste araçları ve kayıtların listesi: kontroller bölümüne yerleştirilir. */
+  body: ReactNode
+}
+
+/**
+ * Kişi/seçenek listesinin düzenleyicisi. Ekleme çubuğu ile liste aynı durumu
+ * paylaşır ama farklı yerlerde durabilsin diye iki parça olarak döner.
+ */
+export function useEntryEditor({ entries, onChange, noun, placeholder, disabled, max = 60, lists = true }: Options): EntryEditor {
   const id = useId()
   const [draft, setDraft] = useState('')
   const [message, setMessage] = useState<{ tone: 'info' | 'warn' | 'error'; text: string } | null>(null)
   const [editing, setEditing] = useState<string | null>(null)
   const [editText, setEditText] = useState('')
   const [sheet, setSheet] = useState<null | 'save' | 'load'>(null)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const reduced = useReducedMotion()
   const dups = useMemo(() => duplicateKeys(entries), [entries])
 
-  const add = () => {
-    const res = addNames(entries, draft)
+  const addText = (text: string) => {
+    const res = addNames(entries, text)
     if (res.added === 0) {
       setMessage({ tone: 'error', text: `Eklenecek ${noun} yok. Boş satırlar ve yalnızca boşluk içeren kayıtlar atlanır.` })
       return
@@ -70,46 +81,64 @@ export function EntryEditor({ entries, onChange, noun, placeholder, disabled, ma
     setMessage({ tone: 'info', text: `“${e.name}” silindi.` })
   }
 
-  const counter = `${entries.length} ${noun}`
+  const label = noun[0].toLocaleUpperCase('tr-TR') + noun.slice(1) + ' ekle'
 
-  return (
-    <div className="editor">
-      <label className="editor__label" htmlFor={`${id}-in`}>
-        {noun[0].toLocaleUpperCase('tr-TR') + noun.slice(1)} ekle
-      </label>
-      <div className="editor__add">
-        <textarea
+  const adder = (
+    <div className="adder">
+      <form
+        className="adder__row"
+        onSubmit={(e) => {
+          e.preventDefault()
+          addText(draft)
+        }}
+      >
+        <label className="sr-only" htmlFor={`${id}-in`}>
+          {label}
+        </label>
+        <input
           id={`${id}-in`}
           ref={inputRef}
-          className="field editor__input"
-          rows={2}
+          className="field adder__input"
+          type="text"
           value={draft}
           disabled={disabled}
           placeholder={placeholder}
-          aria-describedby={`${id}-hint ${message ? `${id}-msg` : ''}`}
+          autoComplete="off"
+          autoCapitalize="words"
+          enterKeyHint="done"
+          aria-describedby={message ? `${id}-msg` : undefined}
           onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+          onPaste={(e) => {
+            // Tek satırlık kutu satır sonlarını silerdi; çok satırlı yapıştırmayı doğrudan listeye ekle.
+            const pasted = e.clipboardData.getData('text')
+            if (/[\r\n]/.test(pasted.trim())) {
               e.preventDefault()
-              add()
+              addText(draft ? `${draft}\n${pasted}` : pasted)
             }
           }}
         />
-        <Button variant="secondary" icon="plus" onClick={add} disabled={disabled} aria-label={`${noun} ekle`}>
+        <Button variant="secondary" type="submit" icon="plus" disabled={disabled}>
           Ekle
         </Button>
+      </form>
+      <div id={`${id}-msg`} aria-live="polite">
+        {message &&
+          (message.tone === 'info' ? (
+            // Başarı bildirimi yalnızca ekran okuyucuya; görünür geri bildirim listenin kendisi.
+            <span className="sr-only">{message.text}</span>
+          ) : (
+            <Notice tone={message.tone}>{message.text}</Notice>
+          ))}
       </div>
-      <p className="editor__hint" id={`${id}-hint`}>
-        Virgülle ayır ya da her satıra bir tane yaz. Alt satır için Shift + Enter.
-      </p>
-      {message && (
-        <div id={`${id}-msg`} aria-live="polite">
-          <Notice tone={message.tone}>{message.text}</Notice>
-        </div>
-      )}
+    </div>
+  )
 
+  const body = (
+    <div className="editor">
       <div className="editor__bar">
-        <span className="editor__count">{counter}</span>
+        <span className="editor__count">
+          {entries.length} {noun}
+        </span>
         <div className="editor__tools">
           {lists && (
             <>
@@ -216,6 +245,8 @@ export function EntryEditor({ entries, onChange, noun, placeholder, disabled, ma
       )}
     </div>
   )
+
+  return { adder, body }
 }
 
 function ListsSheet({

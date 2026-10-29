@@ -9,7 +9,7 @@ import { useBusy, useMounted, useReducedMotion, wait } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { labelBudget, Wheel, type WheelHandle } from '../objects/Wheel'
 import { Button, Group, Notice, Row, Switch } from '../ui/controls'
-import { EntryEditor } from '../ui/EntryEditor'
+import { useEntryEditor } from '../ui/EntryEditor'
 import { useExample } from '../ui/ExampleBanner'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
@@ -17,7 +17,7 @@ const isBool = (v: unknown): v is boolean => typeof v === 'boolean'
 
 export function WheelTool() {
   const [options, setOptions] = usePersistent<Entry[]>('cark:list', [], isEntryList)
-  const [removeWinner, setRemoveWinner] = usePersistent('cark:remove', false, isBool)
+  const [removeWinner, setRemoveWinner] = usePersistent('cark:remove2', true, isBool)
   const [winner, setWinner] = useState<Entry | null>(null)
   const [winnerIdx, setWinnerIdx] = useState<number | null>(null)
   const [live, setLive] = useState('')
@@ -25,7 +25,7 @@ export function WheelTool() {
   const { busy, run } = useBusy()
   const reduced = useReducedMotion()
   const mounted = useMounted()
-  const { record, announce } = useStore()
+  const { record } = useStore()
 
   const banner = useExample('cark', (e) => {
     const prev = options
@@ -78,7 +78,6 @@ export function WheelTool() {
       haptic(30)
       setLive(`Çark durdu. Sonuç: ${chosen.name}.`)
       record(key, { tool: 'cark', title: chosen.name, detail: `${snapshot.length} seçenek: ${snapshot.map((o) => o.name).join(', ')}` })
-      announce({ tool: 'cark', headline: chosen.name, detail: `${snapshot.length} seçenek arasından` })
     })
 
   const willRemove = removeWinner && winner !== null && options.some((o) => o.id === winner.id)
@@ -102,7 +101,6 @@ export function WheelTool() {
             exit={{ opacity: 0, y: -6 }}
             transition={{ type: 'spring', bounce: 0.35, duration: 0.5 }}
           >
-            <span className="result__label">Sonuç</span>
             <span className="result__value">{winner.name}</span>
           </motion.div>
         )}
@@ -120,15 +118,17 @@ export function WheelTool() {
     </div>
   )
 
+  const editor = useEntryEditor({ entries: options, onChange: setOptions, noun: 'seçenek', placeholder: 'Pizza, Döner, Mantı', disabled: busy, max: MAX_OPTIONS })
+
   const controls = (
     <>
       <Group title="Seçenekler" id="cark-secenek">
-        <EntryEditor entries={options} onChange={setOptions} noun="seçenek" placeholder={'Pizza, Döner, Mantı\nya da her satıra bir seçenek'} disabled={busy} max={MAX_OPTIONS} />
+        {editor.body}
       </Group>
       {truncated && <Notice>Uzun seçenekler çarkta kısaltılarak gösterilir; sonuçta tam adı yazar.</Notice>}
       {usesLegend && <Notice>13 ve üzeri seçenekte dilimlerde numara gösterilir; isimler çarkın altındaki listede.</Notice>}
       <Group title="Turlar" id="cark-tur">
-        <Row label="Kazananı sonraki turlardan çıkar" hint="Açıksa çıkan seçenek, bir sonraki çevirişten önce çarktan kaldırılır.">
+        <Row label="Kazananı sonraki turlardan çıkar">
           <Switch checked={removeWinner} onChange={setRemoveWinner} label="Kazananı sonraki turlardan çıkar" disabled={busy} />
         </Row>
       </Group>
@@ -151,6 +151,7 @@ export function WheelTool() {
   return (
     <ToolScaffold
       tool="cark"
+      topBar={editor.adder}
       stage={stage}
       controls={controls}
       action={action}
@@ -159,6 +160,7 @@ export function WheelTool() {
       rules={[
         'Her seçeneğin çıkma olasılığı eşittir.',
         'Sonuç çark dönmeden önce belirlenir; çark işaretçinin gösterdiği dilimde durur.',
+        'Kazananı çıkar açıksa çıkan seçenek, bir sonraki çevirişten önce çarktan kaldırılır.',
         'En az iki seçenek gerekir.',
       ]}
     />
