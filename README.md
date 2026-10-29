@@ -58,6 +58,12 @@ Yalnızca fare kullanan cihazlarda ve hareket azaltılmamışsa görünür. Ekra
 - `vite.config.ts` içindeki küçük eklenti, derleme çıktısındaki tüm dosyaları listeleyen `sw.js` üretir. İlk başarılı yüklemede her şey önbelleğe alınır; sonraki açılışlar çevrimdışı çalışır.
 - Service worker yalnızca üretim derlemesinde kaydedilir.
 
+## Yayınlama (GitHub Pages)
+
+`.github/workflows/pages.yml`, `main` dalına her gönderimde testleri çalıştırır, uygulamayı derler ve GitHub Pages'e yayınlar. Depoda bir kez **Settings → Pages → Build and deployment → Source: GitHub Actions** seçilmelidir. Yol göreli (`base: './'`) ve yönlendirme `#` tabanlı olduğundan uygulama `kullanici.github.io/depo/` gibi alt yolda da çalışır.
+
+Telefonda ana ekrana eklemek için yayınlanan adresi aç: iPhone'da Safari → Paylaş → Ana Ekrana Ekle; Android'de Chrome menüsü → Uygulamayı yükle. İlk açılıştan sonra çevrimdışı da çalışır. Yeni sürüm yayınlandığında uygulamayı kapatıp iki kez açmak gerekebilir (eski önbellek önce kullanılır).
+
 ## Mobil uygulamaya geçiş (Capacitor)
 
 Proje Capacitor'a uygun kuruldu: göreli yollar (`base: './'`), hash tabanlı yönlendirme, sunucu ve harici varlık yok. İleride:
