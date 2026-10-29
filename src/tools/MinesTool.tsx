@@ -4,7 +4,6 @@ import { clampMines, clampSize, maxMines, MAX_SIZE, MIN_SIZE, newGame, reveal, s
 import { haptic, sfx } from '../features/sound'
 import { usePersistent, useStore } from '../state/store'
 import { Button, Row, Segmented, Stepper } from '../ui/controls'
-import { Icon } from '../ui/Icon'
 import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
@@ -96,7 +95,7 @@ export function MinesTool() {
               disabled={over || c.open}
               onClick={() => tap(i)}
             >
-              {c.open ? c.mine ? <MineIcon size={28} /> : <Icon name="check" size={24} /> : null}
+              {c.open && c.mine ? <MineIcon size={28} /> : null}
             </button>
           ))}
         </div>
