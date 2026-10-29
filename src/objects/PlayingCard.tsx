@@ -102,9 +102,29 @@ function systemBack(theme: Theme, blue: boolean): CardBackColor {
   return { ...CARD_BACKS.find((b) => b.id === (blue ? 'mavi' : 'kirmizi'))!, id: 'sistem', name: 'Sistem' }
 }
 
+export const CARD_FACES = [
+  { id: 'beyaz', name: 'Beyaz', bg: '#f8f5ee', edge: 'rgba(0,0,0,0.08)' },
+  { id: 'siyah', name: 'Siyah', bg: '#1c1c1e', edge: 'rgba(255,255,255,0.14)' },
+  { id: 'krem', name: 'Krem', bg: '#f1e4c8', edge: 'rgba(0,0,0,0.1)' },
+  { id: 'gri', name: 'Gri', bg: '#d8d8dc', edge: 'rgba(0,0,0,0.1)' },
+  { id: 'lacivert', name: 'Lacivert', bg: '#16213a', edge: 'rgba(255,255,255,0.16)' },
+]
+export const CARD_INKS = [
+  { id: 'klasik', name: 'Klasik', ink: '#1c1c1e', red: '#d1202f' },
+  { id: 'acik', name: 'Açık', ink: '#ecebe6', red: '#c9232d' },
+  { id: 'claude', name: 'Claude', ink: '#3b3a36', red: '#d97757' },
+  { id: 'mavi', name: 'Mavi-turuncu', ink: '#1d3a8a', red: '#e07a1f' },
+  { id: 'yesil', name: 'Yeşil-kırmızı', ink: '#14532d', red: '#b91c1c' },
+]
+export const isFaceId = (v: unknown): v is string => v === 'sistem' || (typeof v === 'string' && CARD_FACES.some((b) => b.id === v))
+export const isInkId = (v: unknown): v is string => v === 'sistem' || (typeof v === 'string' && CARD_INKS.some((b) => b.id === v))
+
 /** Kart sahnesine uygulanan renk değişkenleri. */
-export function cardVars(theme: Theme, back: string, blue: boolean): CSSProperties {
-  const f = FACES[theme]
+export function cardVars(theme: Theme, back: string, blue: boolean, face = 'sistem', inks = 'sistem'): CSSProperties {
+  const base = FACES[theme]
+  const fo = CARD_FACES.find((x) => x.id === face)
+  const io = CARD_INKS.find((x) => x.id === inks)
+  const f = { bg: fo?.bg ?? base.bg, edge: fo?.edge ?? base.edge, ink: io?.ink ?? base.ink, red: io?.red ?? base.red }
   const b = back === 'sistem' ? systemBack(theme, blue) : (CARD_BACKS.find((x) => x.id === back) ?? systemBack(theme, blue))
   return {
     '--cf-bg': f.bg,

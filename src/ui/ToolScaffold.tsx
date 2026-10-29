@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { navigate } from '../state/router'
 import { TOOLS, type ToolId } from '../state/tools'
 import { ToolGlyph } from '../objects/ToolGlyph'
-import { IconButton } from './controls'
+import { Button, IconButton, Row } from './controls'
 import { Icon } from './Icon'
 import { DeleteZone, DragDeleteProvider } from './dragDelete'
 import { Sheet } from './Sheet'
@@ -87,7 +87,24 @@ export function ToolScaffold({ tool, stage, controls, action, rules, live, banne
               <h3 className="info__title" id={`info-set-${tool}`}>
                 Ayarlar
               </h3>
-              <div className="info__settings">{settings}</div>
+              <div className="info__settings">
+                {settings}
+                {onReset && (
+                  <Row label="Sıfırla" hint="Sol üstteki düğmenin işi: listeyi ve sonucu temizler.">
+                    <Button
+                      variant="secondary"
+                      icon="refresh"
+                      disabled={resetDisabled}
+                      onClick={() => {
+                        onReset()
+                        setInfo(false)
+                      }}
+                    >
+                      Sıfırla
+                    </Button>
+                  </Row>
+                )}
+              </div>
             </section>
           )}
           <section className="info" aria-labelledby={`info-rules-${tool}`}>

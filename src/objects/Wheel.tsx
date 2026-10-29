@@ -1,5 +1,5 @@
 import { animate, motion, useMotionValue, useMotionValueEvent } from 'motion/react'
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, type CSSProperties, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { indexAtPointer, shortLabel, sliceAngle } from '../lib/rules/wheel'
 import { sfx } from '../features/sound'
 import { Icon } from '../ui/Icon'
@@ -103,6 +103,7 @@ export const Wheel = forwardRef<
     },
   }))
 
+  const isWinNow = (i: number) => winner === i
   const fontSize = n <= 6 ? 15 : n <= 8 ? 13.5 : n <= 12 ? 12 : 14
 
   return (
@@ -122,8 +123,9 @@ export const Wheel = forwardRef<
           const large = a > 180 ? 1 : 0
           const d = `M0 0 L${R * Math.cos(a0)} ${R * Math.sin(a0)} A${R} ${R} 0 ${large} 1 ${R * Math.cos(a1)} ${R * Math.sin(a1)} Z`
           const mid = i * a + a / 2
-          const text = budget ? shortLabel(label, budget) : String(i + 1)
-          const isWin = winner === i
+          const text = budget ? (isWinNow(i) ? label : shortLabel(label, budget)) : String(i + 1)
+          const isWin = isWinNow(i)
+          const winScale = Math.max(1, Math.min(2, (R - 40) / (Math.max(text.length, 1) * fontSize * 0.58)))
           // Sol yarıdaki yazılar ters durmasın: 180° çevrilip merkeze doğru hizalanır.
           const flip = budget > 0 && mid > 180
           return (
@@ -153,10 +155,11 @@ export const Wheel = forwardRef<
                   y={0}
                   textAnchor={budget ? (flip ? 'start' : 'end') : 'middle'}
                   dominantBaseline="central"
-                  style={{ fill: colors[i].text }}
                   fontSize={fontSize}
                   fontWeight={600}
                   fontFamily="var(--font)"
+                  className={isWin && budget ? 'wheel__label is-win' : 'wheel__label'}
+                  style={{ fill: colors[i].text, transformOrigin: flip ? '0% 50%' : '100% 50%', '--ws': winScale } as CSSProperties}
                   transform={budget ? undefined : `rotate(90 ${R - 22} 0)`}
                 >
                   {text}

@@ -101,7 +101,8 @@ export function WheelTool() {
           />
           {!enough && <p className="wheel-empty">En az iki seçenek ekle</p>}
         </div>
-        <AnimatePresence mode="wait">
+        {usesLegend && (
+          <AnimatePresence mode="wait">
           {winner && !busy && (
             <motion.div
               key={winner.id + String(winnerIdx)}
@@ -114,7 +115,8 @@ export function WheelTool() {
               <span className="result__value">{winner.name}</span>
             </motion.div>
           )}
-        </AnimatePresence>
+          </AnimatePresence>
+        )}
         {usesLegend && (
           <ol className="legend" aria-label="Dilim numaraları">
             {options.map((o, i) => (
@@ -177,7 +179,7 @@ export function WheelTool() {
       stage={stage}
       action={action}
       settings={
-        <Row label="Kazananı çıkar" hint="Sonuçtan sonra “Çıkar” ve “Yeniden çevir” düğmeleri görünür.">
+        <Row label="Kazananı çıkar" hint="Sağ alttaki çizgili düğmenin işi: açıkken sonuçtan sonra “Çıkar” ve “Yeniden çevir” düğmeleri görünür.">
           <Switch checked={removeWinner} onChange={setRemoveWinner} label="Kazananı çıkar" disabled={busy} />
         </Row>
       }

@@ -7,8 +7,8 @@ import { useBusy, useMounted, useReducedMotion } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { Coin, type CoinHandle } from '../objects/Coin'
 import { CoinSymbol, isSymbolId, isToneId, SYMBOLS, symbolName, TONES, toneById, toneGradient, type SymbolId } from '../objects/coinStyles'
-import { Button, Row } from '../ui/controls'
-import { Swatches } from '../ui/Swatches'
+import { Button } from '../ui/controls'
+import { ColorField } from '../ui/ColorField'
 import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
@@ -120,13 +120,10 @@ export function CoinTool() {
       action={action}
       settings={
         <>
-          <Row label="Yazı yüzü rengi" />
-          <Swatches label="Yazı yüzü rengi" value={yaziId} onChange={setYaziId} disabled={busy} options={TONES.map((t) => ({ value: t.id, label: t.name, style: { background: toneGradient(t) } }))} />
-          <Row label="Tura yüzü rengi" />
-          <Swatches label="Tura yüzü rengi" value={turaId} onChange={setTuraId} disabled={busy} options={TONES.map((t) => ({ value: t.id, label: t.name, style: { background: toneGradient(t) } }))} />
-          <Row label="Tura sembolü" />
-          <Swatches
-            label="Tura sembolü"
+          <ColorField label="Yazı yüzü rengi (soldaki düğme)" value={yaziId} onChange={setYaziId} disabled={busy} options={TONES.map((t) => ({ value: t.id, label: t.name, style: { background: toneGradient(t) } }))} />
+          <ColorField label="Tura yüzü rengi (ortadaki düğme)" value={turaId} onChange={setTuraId} disabled={busy} options={TONES.map((t) => ({ value: t.id, label: t.name, style: { background: toneGradient(t) } }))} />
+          <ColorField
+            label="Tura sembolü (sağdaki düğme)"
             value={symbol}
             onChange={setSymbol}
             disabled={busy}

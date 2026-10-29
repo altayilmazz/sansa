@@ -11,12 +11,24 @@ import { Button, Notice, Row, Stepper, Switch } from '../ui/controls'
 import { EntryChips } from '../ui/EntryChips'
 import { useEntryEditor } from '../ui/EntryEditor'
 import { useExample } from '../ui/ExampleBanner'
+import { ColorField } from '../ui/ColorField'
 import { Icon } from '../ui/Icon'
 import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
 const isNum = (v: unknown): v is number => typeof v === 'number'
 const isBool = (v: unknown): v is boolean => typeof v === 'boolean'
+const COLORS = [
+  { id: 'mavi', name: 'Mavi', c: '#3b82f6' },
+  { id: 'kirmizi', name: 'Kırmızı', c: '#e5484d' },
+  { id: 'yesil', name: 'Yeşil', c: '#30a46c' },
+  { id: 'mor', name: 'Mor', c: '#8e4ec6' },
+  { id: 'turuncu', name: 'Turuncu', c: '#f76b15' },
+  { id: 'pembe', name: 'Pembe', c: '#d6409f' },
+  { id: 'sari', name: 'Sarı', c: '#e5b800' },
+  { id: 'gri', name: 'Gri', c: '#8b8d98' },
+]
+const isColor = (v: unknown): v is string => v === 'sistem' || (typeof v === 'string' && COLORS.some((c) => c.id === v))
 const isIds = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string')
 
 export function DrawTool() {
@@ -25,6 +37,7 @@ export function DrawTool() {
   // Çekilen kayıt sonraki turlardan çıkar (varsayılan açık). Anahtar yenilendi: eski kayıtlı seçim ezmesin.
   const [removeDrawn, setRemoveDrawn] = usePersistent('kura:remove2', true, isBool)
   const [drawnIds, setDrawnIds] = usePersistent<string[]>('kura:drawn', [], isIds)
+  const [color, setColor] = usePersistent('kura:renk', 'sistem', isColor)
   const [winners, setWinners] = useState<Entry[] | null>(null)
   const [phase, setPhase] = useState<'idle' | 'mix' | 'reveal' | 'done'>('idle')
   const [round, setRound] = useState(0)
@@ -85,6 +98,7 @@ export function DrawTool() {
         await wait(650)
       }
       if (!mounted.current) return
+      setRound((r) => r + 1)
       setWinners(result)
       setPhase('reveal')
       for (let i = 0; i < result.length; i++) {
@@ -93,7 +107,6 @@ export function DrawTool() {
       }
       if (!mounted.current) return
       setPhase('done')
-      setRound((r) => r + 1)
       if (removeDrawn) setDrawnIds((d) => [...d, ...result.map((r) => r.id)])
       sfx.win()
       const names = result.map((r) => r.name)
@@ -120,9 +133,20 @@ export function DrawTool() {
     </li>
   )
 
+  const picked = COLORS.find((c) => c.id === color)
+  const colorVars = picked
+    ? ({
+        '--bowl': `color-mix(in srgb, ${picked.c} 45%, #101012)`,
+        '--bowl-rim': `color-mix(in srgb, ${picked.c} 70%, #101012)`,
+        '--slip-b': picked.c,
+        '--ticket-n': picked.c,
+        '--ticket-n-ink': '#ffffff',
+      } as CSSProperties)
+    : undefined
+
   const stage = (
     <>
-      <div className="stage-body draw-stage">
+      <div className="stage-body draw-stage" style={colorVars}>
         <div className="draw-main">
           {entries.length === 0 ? (
             <div className="stage-empty">
@@ -207,10 +231,21 @@ export function DrawTool() {
 
   const settings = (
     <>
-      <Row label="Kazanan sayısı" hint="Sahnedeki taç düğmeleri 1 ve 2 içindir; daha fazlası için buradan ayarla.">
+      <Row label="Kazanan sayısı" hint="Sol alttaki taç düğmeleri 1 ve 2 içindir; daha fazlasını buradan ayarla.">
         <Stepper value={n} min={1} max={maxCount} onChange={setCount} label="Kazanan sayısı" disabled={busy || pool.length === 0} />
       </Row>
-      <Row label="Çekileni sonraki turlardan çıkar">
+      <ColorField
+        label="Kase ve bilet rengi"
+        value={color}
+        onChange={setColor}
+        options={[{ value: 'sistem', label: 'Sistem', style: { background: 'var(--bowl-rim)' } }, ...COLORS.map((c) => ({ value: c.id, label: c.name, style: { background: c.c } }))]}
+      />
+      <Row label="Son eklenen kaydı çıkar" hint="Sağ üstteki ok düğmesinin işi: listenin sonuna eklenen adı siler.">
+        <Button variant="secondary" icon="undo" onClick={editor.undoLast} disabled={busy || entries.length === 0}>
+          Çıkar
+        </Button>
+      </Row>
+      <Row label="Çekileni sonraki turlardan çıkar" hint="Sağ alttaki çizgili düğmenin işi: çekilen kayıt sonraki turlarda havuza girmez.">
         <Switch checked={removeDrawn} onChange={setRemoveDrawn} label="Çekileni sonraki turlardan çıkar" disabled={busy} />
       </Row>
       {removeDrawn && entries.length > 0 && (

@@ -184,7 +184,7 @@ export function TeamsTool() {
       stage={stage}
       action={action}
       settings={
-        <Row label="Takım sayısı" hint={`${entries.length} kişi`}>
+        <Row label="Takım sayısı" hint={`Sahnedeki − ve + düğmelerinin işi. Şu an ${entries.length} kişi var.`}>
           <Stepper value={count} min={MIN_TEAMS} max={MAX_TEAMS} onChange={setCount} label="Takım sayısı" disabled={busy} format={(n) => `${n} takım`} />
         </Row>
       }

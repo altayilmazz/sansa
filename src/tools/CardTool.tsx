@@ -7,9 +7,9 @@ import { haptic, sfx } from '../features/sound'
 import { useBusy, useMounted, useReducedMotion, wait } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { CardFan } from '../objects/CardFan'
-import { CARD_BACKS, CardBack, CardFace, cardVars, isBackId } from '../objects/PlayingCard'
+import { CARD_BACKS, CARD_FACES, CARD_INKS, CardBack, CardFace, cardVars, isBackId, isFaceId, isInkId } from '../objects/PlayingCard'
 import { useTheme } from '../state/useTheme'
-import { Swatches } from '../ui/Swatches'
+import { ColorField } from '../ui/ColorField'
 import { Button, Notice, Row, Switch } from '../ui/controls'
 import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
@@ -51,10 +51,12 @@ function Slot({ label, card, reduced, highlight, active }: { label?: string; car
 export function CardTool() {
   const [duel, setDuel] = usePersistent('kart:duel2', false, isBool)
   const [back, setBack] = usePersistent('kart:back', 'sistem', isBackId)
+  const [faceC, setFaceC] = usePersistent('kart:yuz', 'sistem', isFaceId)
+  const [inkC, setInkC] = usePersistent('kart:sembol', 'sistem', isInkId)
   const theme = useTheme()
   // Açık temada "sistem" sırtı, her açılışta kırmızı ya da mavi olur.
   const blue = useMemo(() => Math.random() < 0.5, [])
-  const vars = cardVars(theme, back, blue)
+  const vars = cardVars(theme, back, blue, faceC, inkC)
   const deck = useRef<Deck>(null as unknown as Deck)
   if (!deck.current) deck.current = new Deck()
   const [, setVersion] = useState(0)
@@ -243,9 +245,8 @@ export function CardTool() {
       action={action}
       settings={
         <>
-          <Row label="Kart sırtı rengi" hint="Sistem: temaya uyar. Ön yüz renkleri her zaman temaya göre seçilir." />
-          <Swatches
-            label="Kart sırtı rengi"
+          <ColorField
+            label="Kart sırtı"
             value={back}
             onChange={setBack}
             options={[
@@ -253,7 +254,30 @@ export function CardTool() {
               ...CARD_BACKS.map((b) => ({ value: b.id, label: b.name, style: { background: b.base, boxShadow: `inset 0 0 0 3px ${b.frame}` } })),
             ]}
           />
-          <Row label="Karşılaşma" hint="İki oyuncu birer kart çeker, yüksek kart kazanır.">
+          <ColorField
+            label="Kart ön yüzü"
+            value={faceC}
+            onChange={setFaceC}
+            options={[
+              { value: 'sistem', label: 'Sistem', style: { background: String(cardVars(theme, back, blue)['--cf-bg' as keyof typeof vars]) } },
+              ...CARD_FACES.map((f) => ({ value: f.id, label: f.name, style: { background: f.bg } })),
+            ]}
+          />
+          <ColorField
+            label="Semboller"
+            value={inkC}
+            onChange={setInkC}
+            options={[
+              { value: 'sistem', label: 'Sistem', style: { background: `linear-gradient(90deg, ${String(cardVars(theme, back, blue)['--cf-ink' as keyof typeof vars])} 50%, ${String(cardVars(theme, back, blue)['--cf-red' as keyof typeof vars])} 50%)` } },
+              ...CARD_INKS.map((c) => ({ value: c.id, label: c.name, style: { background: `linear-gradient(90deg, ${c.ink} 50%, ${c.red} 50%)` } })),
+            ]}
+          />
+          <Row label="Karıştır" hint="Kalan kartları karıştırır (sağ alttaki düğmenin işi).">
+            <Button variant="secondary" icon="shuffle" disabled={busy || remaining < 2} onClick={shuffle}>
+              Karıştır
+            </Button>
+          </Row>
+          <Row label="Karşılaşma" hint="Sol alttaki iki düğmenin işi: kapalıyken tek kart, açıkken iki oyuncu birer kart çeker ve yüksek kart kazanır.">
             <Switch
               checked={duel}
               label="Karşılaşma"

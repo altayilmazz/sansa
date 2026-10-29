@@ -960,3 +960,53 @@ button.chip {
   justify-content: center;
   gap: 0;
 }
+
+/* Renk alanı ve küçük renk penceresi */
+.colorfield {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 6px 0;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  font-size: var(--fs-callout);
+  text-align: left;
+}
+.colorfield__value {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: var(--fs-sub);
+}
+.colorfield:disabled {
+  opacity: 0.4;
+}
+.cpop {
+  margin: auto;
+  width: min(86vw, 340px);
+  padding: 0;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-object);
+}
+.cpop::backdrop {
+  background: var(--scrim);
+}
+.cpop__panel {
+  padding: 14px;
+}
+.cpop__title {
+  font-size: var(--fs-sub);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.cpop .swatches {
+  margin-top: 10px;
+}

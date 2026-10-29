@@ -202,7 +202,7 @@ export function DiceTool() {
       action={action}
       settings={
         <>
-          <Row label="Zar sayısı">
+          <Row label="Zar sayısı" hint="Sol alttaki I ve II düğmelerinin işi.">
             <Segmented
               label="Zar sayısı"
               value={countS}
@@ -217,7 +217,7 @@ export function DiceTool() {
               }}
             />
           </Row>
-          <Row label="Karşılaşma" hint="İki oyuncu atar, yüksek toplam kazanır.">
+          <Row label="Karşılaşma" hint="Sağ alttaki Vs düğmesinin işi: iki oyuncu atar, yüksek toplam kazanır.">
             <Switch
               checked={duel}
               label="Karşılaşma"
