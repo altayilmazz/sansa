@@ -88,6 +88,21 @@ export const isBackId = (v: unknown): v is string => v === 'sistem' || (typeof v
 
 type Theme = 'light' | 'dark' | 'special'
 
+const lum = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16)
+  const ch = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
+    const c = v / 255
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2]
+}
+const contrast = (a: string, b: string) => {
+  const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p)
+  return (x + 0.05) / (y + 0.05)
+}
+/** Zemin üzerinde okunmayan renk yerine, zeminin zıttı olan bir ton kullanılır. */
+const legible = (color: string, bg: string) => (contrast(color, bg) >= 3 ? color : lum(bg) < 0.4 ? '#f4f1ea' : '#1c1c1e')
+
 /** Temaya göre ön yüz renkleri. */
 const FACES: Record<Theme, { bg: string; ink: string; red: string; edge: string }> = {
   light: { bg: '#f8f5ee', ink: '#1c1c1e', red: '#d1202f', edge: 'rgba(0,0,0,0.08)' },
@@ -124,7 +139,8 @@ export function cardVars(theme: Theme, back: string, blue: boolean, face = 'sist
   const base = FACES[theme]
   const fo = CARD_FACES.find((x) => x.id === face)
   const io = CARD_INKS.find((x) => x.id === inks)
-  const f = { bg: fo?.bg ?? base.bg, edge: fo?.edge ?? base.edge, ink: io?.ink ?? base.ink, red: io?.red ?? base.red }
+  const bg = fo?.bg ?? base.bg
+  const f = { bg, edge: fo?.edge ?? base.edge, ink: legible(io?.ink ?? base.ink, bg), red: legible(io?.red ?? base.red, bg) }
   const b = back === 'sistem' ? systemBack(theme, blue) : (CARD_BACKS.find((x) => x.id === back) ?? systemBack(theme, blue))
   return {
     '--cf-bg': f.bg,

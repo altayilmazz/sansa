@@ -109,7 +109,7 @@
   border: 1px solid var(--hairline);
 }
 .board:not(.is-open) .block {
-  min-height: clamp(172px, 25dvh, 250px);
+  min-height: clamp(150px, 22dvh, 250px);
 }
 
 /* Blok yüzü (kapalıyken) */

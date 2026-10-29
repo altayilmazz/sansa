@@ -146,11 +146,7 @@ export function Board({ selected }: { selected: ToolId | null }) {
     return (
       <ToolHostContext.Provider value={host}>
         <div className={`board${open ? ' is-open' : ''}`}>
-          {!open && (
-            <header className="board__intro">
-              <h1 className="board__title">Belirle</h1>
-            </header>
-          )}
+          <h1 className="sr-only">Şansa</h1>
           <div className="board__grid">
             {TOOL_ORDER.map((id) => {
               const isOpen = id === selected
@@ -207,11 +203,7 @@ export function Board({ selected }: { selected: ToolId | null }) {
   return (
     <ToolHostContext.Provider value={host}>
       <div className={`board${open ? ' is-open' : ''}`}>
-        {!open && (
-          <header className="board__intro">
-            <h1 className="board__title">Belirle</h1>
-          </header>
-        )}
+        <h1 className="sr-only">Şansa</h1>
         <div className="board__grid">
           {TOOL_ORDER.map((id) => {
             const sel = id === selected
