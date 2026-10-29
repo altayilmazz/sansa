@@ -53,13 +53,11 @@ const vnorm = (a: V): V => vmul(a, 1 / Math.hypot(a[0], a[1], a[2]))
 const r3 = (n: number) => Math.round(n * 1000) / 1000
 
 /** Yüz rengi ile köşe rengi arasında yumuşak geçiş (t: 0 = yüz, 1 = çapraz). */
-const FACE_RGB = [243, 238, 226]
-const DEEP_RGB = [229, 222, 205]
+/** Yüz ile derin ton arasındaki geçiş; renkler --die-face ve --die-deep değişkenlerinden gelir. */
 function shade(normal: V): string {
   const maxc = Math.max(Math.abs(normal[0]), Math.abs(normal[1]), Math.abs(normal[2]))
   const t = Math.min(1, Math.max(0, (1 - maxc) / (1 - 1 / Math.sqrt(3))))
-  const c = FACE_RGB.map((f, i) => Math.round(f + (DEEP_RGB[i] - f) * t))
-  return `rgb(${c[0]},${c[1]},${c[2]})`
+  return `color-mix(in srgb, var(--die-face, #f3eee2) ${Math.round((1 - t) * 100)}%, var(--die-deep, #e5decd))`
 }
 
 interface Piece {
@@ -227,3 +225,35 @@ export const Die = forwardRef<DieHandle, { size?: number; label?: string }>(func
     </div>
   )
 })
+
+export interface DiceColor {
+  id: string
+  name: string
+  face: string
+  deep: string
+  pip: string
+  ace: string
+}
+
+/** Zar renk seçenekleri; "Sistem" temaya göre ayrıca seçilir. */
+export const DICE_COLORS: DiceColor[] = [
+  { id: 'krem', name: 'Krem', face: '#f3eee2', deep: '#e5decd', pip: '#1c1c1e', ace: '#e5383b' },
+  { id: 'beyaz', name: 'Beyaz', face: '#fafafa', deep: '#e4e4e8', pip: '#1c1c1e', ace: '#e5383b' },
+  { id: 'siyah', name: 'Siyah', face: '#2a2a2d', deep: '#1c1c1e', pip: '#f4f1ea', ace: '#ff5a52' },
+  { id: 'kirmizi', name: 'Kırmızı', face: '#d92d3a', deep: '#b3202c', pip: '#ffffff', ace: '#ffffff' },
+  { id: 'mavi', name: 'Mavi', face: '#2f66e0', deep: '#2150b8', pip: '#ffffff', ace: '#ffd60a' },
+  { id: 'yesil', name: 'Yeşil', face: '#2e9e5b', deep: '#237a46', pip: '#ffffff', ace: '#ffd60a' },
+]
+export const isDiceColor = (v: unknown): v is string => v === 'sistem' || (typeof v === 'string' && DICE_COLORS.some((c) => c.id === v))
+
+type DiceTheme = 'light' | 'dark' | 'special'
+const DICE_SYSTEM: Record<DiceTheme, DiceColor> = {
+  dark: { id: 'sistem', name: 'Sistem', face: '#d6d6da', deep: '#bdbdc2', pip: '#121214', ace: '#3a3a3c' },
+  light: { id: 'sistem', name: 'Sistem', face: '#f5f7fb', deep: '#dfe4ee', pip: '#1d2433', ace: '#2563eb' },
+  special: { id: 'sistem', name: 'Sistem', face: '#ece6d6', deep: '#d9d0b8', pip: '#262624', ace: '#d97757' },
+}
+export const diceColors = (theme: DiceTheme): DiceColor[] => [DICE_SYSTEM[theme], ...DICE_COLORS]
+export const diceVars = (theme: DiceTheme, id: string): CSSProperties => {
+  const c = id === 'sistem' ? DICE_SYSTEM[theme] : (DICE_COLORS.find((x) => x.id === id) ?? DICE_SYSTEM[theme])
+  return { '--die-face': c.face, '--die-deep': c.deep, '--die-pip': c.pip, '--die-ace': c.ace } as CSSProperties
+}

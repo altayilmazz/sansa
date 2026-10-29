@@ -8,6 +8,9 @@ import { useBusy, useMounted, useReducedMotion, useMedia } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { Die, type DieHandle } from '../objects/Die'
 import { Button, Row, Segmented, Switch } from '../ui/controls'
+import { ColorField } from '../ui/ColorField'
+import { diceColors, diceVars, isDiceColor } from '../objects/Die'
+import { useTheme } from '../state/useTheme'
 import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
@@ -21,6 +24,9 @@ const sumText = (v: readonly DieValue[]) => (v.length === 1 ? String(v[0]) : `${
 export function DiceTool() {
   const [countS, setCountS] = usePersistent<Count>('zar:count', '2', isCount)
   const [duel, setDuel] = usePersistent('zar:duel2', false, isBool)
+  const [diceId, setDiceId] = usePersistent('zar:renk', 'sistem', isDiceColor)
+  const theme = useTheme()
+  const vars = diceVars(theme, diceId)
   const count = Number(countS)
   const [vals, setVals] = useState<{ a: DieValue[]; b?: DieValue[] } | null>(null)
   const [outcome, setOutcome] = useState<RoundOutcome | null>(null)
@@ -106,7 +112,7 @@ export function DiceTool() {
 
   const stage = (
     <>
-      <div className="stage-body dice-stage">
+      <div className="stage-body dice-stage" style={vars}>
         {duel ? (
           <div className="trays">
             <div className="trays__col">
@@ -202,6 +208,12 @@ export function DiceTool() {
       action={action}
       settings={
         <>
+          <ColorField
+            label="Zar rengi"
+            value={diceId}
+            onChange={setDiceId}
+            options={diceColors(theme).map((c) => ({ value: c.id, label: c.name, style: { background: c.face, boxShadow: `inset 0 0 0 5px ${c.face}, inset 0 0 0 12px ${c.pip}` } }))}
+          />
           <Row label="Zar sayısı" hint="Sol alttaki I ve II düğmelerinin işi.">
             <Segmented
               label="Zar sayısı"

@@ -20,8 +20,29 @@ export const TONES: CoinTone[] = [
   { id: 'gul', name: 'Gül', stops: ['#ffd6e3', '#f08aaa', '#c24f78', '#7d2c4c'], rim: '#d2688c', rim2: '#8f3a59', ink: '#5a1b33' },
 ]
 
-export const toneById = (id: string): CoinTone => TONES.find((t) => t.id === id) ?? TONES[0]
-export const isToneId = (v: unknown): v is string => typeof v === 'string' && TONES.some((t) => t.id === v)
+type Theme = 'light' | 'dark' | 'special'
+
+/** "Sistem" tonu: uygulamanın temasına uyar (koyu: gri, açık: mavi-gri, Claude: turuncu-krem). */
+const SYSTEM: Record<Theme, { yazi: CoinTone; tura: CoinTone }> = {
+  dark: {
+    yazi: { id: 'sistem', name: 'Sistem', stops: ['#f2f2f7', '#c7c7cc', '#8e8e93', '#48484a'], rim: '#a1a1a6', rim2: '#636366', ink: '#2c2c2e' },
+    tura: { id: 'sistem', name: 'Sistem', stops: ['#8e8e93', '#636366', '#3a3a3c', '#1c1c1e'], rim: '#636366', rim2: '#2c2c2e', ink: '#d1d1d6' },
+  },
+  light: {
+    yazi: { id: 'sistem', name: 'Sistem', stops: ['#dbe7ff', '#7ea6f5', '#3f6fd8', '#1e3f94'], rim: '#4f7fe0', rim2: '#274aa6', ink: '#102a6b' },
+    tura: { id: 'sistem', name: 'Sistem', stops: ['#ffffff', '#e3e7ef', '#b9c1d1', '#8a93a6'], rim: '#c3cad8', rim2: '#8892a6', ink: '#3a4458' },
+  },
+  special: {
+    yazi: { id: 'sistem', name: 'Sistem', stops: ['#ffd8c4', '#e8a083', '#d97757', '#a8482e'], rim: '#d97757', rim2: '#a8482e', ink: '#6e2a14' },
+    tura: { id: 'sistem', name: 'Sistem', stops: ['#fffdf7', '#f1ead9', '#d6cbb0', '#a89c7e'], rim: '#d8cdb2', rim2: '#a89c7e', ink: '#4a4437' },
+  },
+}
+
+export const toneById = (id: string, theme: Theme = 'dark', role: 'yazi' | 'tura' = 'yazi'): CoinTone =>
+  id === 'sistem' ? SYSTEM[theme][role] : (TONES.find((t) => t.id === id) ?? TONES[0])
+/** Seçenek listesi: önce temaya uyan "Sistem", sonra sabit renkler. */
+export const tonesFor = (theme: Theme, role: 'yazi' | 'tura'): CoinTone[] => [SYSTEM[theme][role], ...TONES]
+export const isToneId = (v: unknown): v is string => v === 'sistem' || (typeof v === 'string' && TONES.some((t) => t.id === v))
 
 /** Düğmelerdeki küçük renk örneği için aynı ışık geçişi. */
 export const toneGradient = (t: CoinTone) => `radial-gradient(circle at 34% 28%, ${t.stops[0]} 0%, ${t.stops[1]} 38%, ${t.stops[2]} 78%, ${t.stops[3]} 100%)`

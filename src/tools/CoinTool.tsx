@@ -3,10 +3,11 @@ import { useRef, useState, type ReactNode } from 'react'
 import { uid } from '../lib/random'
 import { FACE_LABEL, flip, type Face } from '../lib/rules/coin'
 import { haptic, sfx } from '../features/sound'
+import { useTheme } from '../state/useTheme'
 import { useBusy, useMounted, useReducedMotion } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { Coin, type CoinHandle } from '../objects/Coin'
-import { CoinSymbol, isSymbolId, isToneId, SYMBOLS, symbolName, TONES, toneById, toneGradient, type SymbolId } from '../objects/coinStyles'
+import { CoinSymbol, isSymbolId, isToneId, SYMBOLS, symbolName, toneById, tonesFor, toneGradient, type SymbolId } from '../objects/coinStyles'
 import { Button } from '../ui/controls'
 import { ColorField } from '../ui/ColorField'
 import { RoundButton, StageBar } from '../ui/StageButtons'
@@ -16,8 +17,8 @@ import { ToolScaffold } from '../ui/ToolScaffold'
 const next = <T,>(list: readonly T[], i: number): T => list[(i + 1) % list.length]
 
 export function CoinTool() {
-  const [yaziId, setYaziId] = usePersistent('para:yazi', 'altin', isToneId)
-  const [turaId, setTuraId] = usePersistent('para:tura', 'gumus', isToneId)
+  const [yaziId, setYaziId] = usePersistent('para:yazi2', 'sistem', isToneId)
+  const [turaId, setTuraId] = usePersistent('para:tura2', 'sistem', isToneId)
   const [symbol, setSymbol] = usePersistent<SymbolId>('para:sembol', 'sincap', isSymbolId)
   const [face, setFace] = useState<Face | null>(null)
   const [live, setLive] = useState('')
@@ -27,8 +28,11 @@ export function CoinTool() {
   const mounted = useMounted()
   const { record } = useStore()
 
-  const yazi = toneById(yaziId)
-  const tura = toneById(turaId)
+  const theme = useTheme()
+  const yaziList = tonesFor(theme, 'yazi')
+  const turaList = tonesFor(theme, 'tura')
+  const yazi = toneById(yaziId, theme, 'yazi')
+  const tura = toneById(turaId, theme, 'tura')
 
   const toss = () =>
     run(async () => {
@@ -80,7 +84,7 @@ export function CoinTool() {
           <RoundButton
             label={`Yazı yüzünün rengi: ${yazi.name}. Değiştirmek için dokun.`}
             disabled={busy}
-            onClick={() => setYaziId(next(TONES, TONES.findIndex((t) => t.id === yaziId)).id)}
+            onClick={() => setYaziId(next(yaziList, yaziList.findIndex((t) => t.id === yaziId)).id)}
           >
             {swatch(yazi, <b>1</b>)}
           </RoundButton>
@@ -89,7 +93,7 @@ export function CoinTool() {
           <RoundButton
             label={`Tura yüzünün rengi: ${tura.name}. Değiştirmek için dokun.`}
             disabled={busy}
-            onClick={() => setTuraId(next(TONES, TONES.findIndex((t) => t.id === turaId)).id)}
+            onClick={() => setTuraId(next(turaList, turaList.findIndex((t) => t.id === turaId)).id)}
           >
             {swatch(tura, <CoinSymbol id={symbol} size={16} color={tura.ink} />)}
           </RoundButton>
@@ -120,8 +124,8 @@ export function CoinTool() {
       action={action}
       settings={
         <>
-          <ColorField label="Yazı yüzü rengi (soldaki düğme)" value={yaziId} onChange={setYaziId} disabled={busy} options={TONES.map((t) => ({ value: t.id, label: t.name, style: { background: toneGradient(t) } }))} />
-          <ColorField label="Tura yüzü rengi (ortadaki düğme)" value={turaId} onChange={setTuraId} disabled={busy} options={TONES.map((t) => ({ value: t.id, label: t.name, style: { background: toneGradient(t) } }))} />
+          <ColorField label="Yazı yüzü rengi (soldaki düğme)" value={yaziId} onChange={setYaziId} disabled={busy} options={yaziList.map((t) => ({ value: t.id, label: t.name, style: { background: toneGradient(t) } }))} />
+          <ColorField label="Tura yüzü rengi (ortadaki düğme)" value={turaId} onChange={setTuraId} disabled={busy} options={turaList.map((t) => ({ value: t.id, label: t.name, style: { background: toneGradient(t) } }))} />
           <ColorField
             label="Tura sembolü (sağdaki düğme)"
             value={symbol}

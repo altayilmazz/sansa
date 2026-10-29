@@ -1377,8 +1377,8 @@ textarea.field {
   display: grid;
   grid-template: repeat(3, 1fr) / repeat(3, 1fr);
   padding: calc(15% - var(--bevel) + var(--overlap));
-  background: #f3eee2;
-  box-shadow: inset 0 -6px 12px rgba(120, 100, 70, 0.18), inset 0 3px 6px rgba(255, 255, 255, 0.6);
+  background: var(--die-face, #f3eee2);
+  box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.14), inset 0 3px 6px rgba(255, 255, 255, 0.35);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
@@ -1391,7 +1391,7 @@ textarea.field {
 }
 .die__core {
   position: absolute;
-  background: #ebe5d6;
+  background: var(--die-deep, #ebe5d6);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
@@ -1402,11 +1402,11 @@ textarea.field {
   border-radius: 50%;
 }
 .die__pip.is-on {
-  background: #1c1c1e;
+  background: var(--die-pip, #1c1c1e);
   box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.6);
 }
 .die__pip.is-on.is-ace {
-  background: #e5383b;
+  background: var(--die-ace, #e5383b);
   width: 110%;
 }
 .die__shadow {
