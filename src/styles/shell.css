@@ -1,0 +1,525 @@
+/* Site kabuğu: üst çubuk, blok tahtası, açılan araç penceresi. */
+:root {
+  --nav-h: 48px;
+}
+@media (min-width: 640px) {
+  :root {
+    --gutter: 24px;
+  }
+}
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 32px;
+  }
+}
+
+/* ───────── Site üst çubuğu ───────── */
+.sitenav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding-top: var(--safe-top);
+  background: rgba(0, 0, 0, 0.82);
+  -webkit-backdrop-filter: var(--blur-bar);
+  backdrop-filter: var(--blur-bar);
+  border-bottom: 1px solid var(--hairline);
+}
+.sitenav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-h);
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+.sitenav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.sitenav__links {
+  display: flex;
+  gap: 2px;
+  margin-right: -8px;
+}
+.sitenav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  color: var(--ink-2);
+  transition: color 0.15s;
+}
+.sitenav__link:hover,
+.sitenav__link[aria-current='page'] {
+  color: var(--ink);
+}
+
+.main {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px var(--gutter) calc(28px + var(--safe-bottom));
+}
+.loading {
+  min-height: 160px;
+}
+
+/* ───────── Blok tahtası ───────── */
+.board__intro {
+  text-align: center;
+  padding: clamp(16px, 4vw, 48px) 0 clamp(22px, 4vw, 40px);
+}
+.board__title {
+  max-width: 21ch;
+  margin: 0 auto;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.028em;
+}
+.board__title:focus {
+  outline: none;
+}
+
+.board__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (min-width: 720px) {
+  .board__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+.block {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+}
+.board:not(.is-open) .block {
+  min-height: clamp(172px, 25dvh, 250px);
+}
+
+/* Blok yüzü (kapalıyken) */
+.block__tile {
+  position: absolute;
+  inset: 0;
+}
+.tile__link {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 18px;
+  border-radius: inherit;
+  transition: background-color 0.2s;
+}
+@media (min-width: 720px) {
+  .tile__link {
+    padding: 24px;
+  }
+}
+.tile__link:hover {
+  background: rgba(255, 255, 255, 0.045);
+}
+.tile__art {
+  --glyph: 52px;
+  display: block;
+  line-height: 0;
+}
+.tile__art svg {
+  width: var(--glyph);
+  height: var(--glyph);
+}
+@media (min-width: 720px) {
+  .tile__art {
+    --glyph: 72px;
+  }
+}
+.tile__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 40px;
+}
+.tile__name {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.tile__blurb {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+@media (min-width: 720px) {
+  .tile__name {
+    font-size: 24px;
+  }
+  .tile__blurb {
+    font-size: 15px;
+    max-width: 40ch;
+  }
+}
+.tn-short {
+  display: none;
+}
+.tile__go {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(210, 210, 215, 0.16);
+  color: var(--ink);
+}
+@media (min-width: 720px) {
+  .tile__go {
+    right: 20px;
+    bottom: 20px;
+  }
+}
+
+/* ───────── Araç açıkken: seçilen büyür, diğerleri kenar şeridine dizilir ───────── */
+.board.is-open {
+  /* üst çubuk + ana alanın üst (20) ve alt (28) boşluğu */
+  height: calc(100dvh - var(--nav-h) - var(--safe-top) - 48px - var(--safe-bottom));
+  min-height: 460px;
+}
+.board.is-open .board__grid {
+  height: 100%;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
+}
+.block--open {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  border-color: var(--hairline-strong);
+  container: panel / inline-size;
+}
+
+/* dar: kenar şeridi üstte yatay */
+.board.is-open .block--tile {
+  min-height: 68px;
+}
+.board.is-open .tile__link {
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  text-align: center;
+}
+.board.is-open .tile__art {
+  --glyph: 28px;
+}
+.board.is-open .tile__text {
+  padding-right: 0;
+}
+.board.is-open .tile__name {
+  font-size: 12px;
+}
+.board.is-open .tile__blurb,
+.board.is-open .tile__go {
+  display: none;
+}
+.board.is-open .tn-full {
+  display: none;
+}
+.board.is-open .tn-short {
+  display: inline;
+}
+
+/* geniş: kenar şeridi sağda dikdörtgen blok sütunu */
+@media (min-width: 860px) {
+  .board.is-open .board__grid {
+    grid-template-columns: minmax(0, 1fr) clamp(210px, 22vw, 270px);
+    grid-template-rows: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .block--open {
+    grid-column: 1;
+    grid-row: 1 / span 5;
+  }
+  .board.is-open .block--tile {
+    min-height: 0;
+  }
+  .board.is-open .tile__link {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 10px 16px;
+    text-align: left;
+  }
+  .board.is-open .tile__art {
+    --glyph: 38px;
+    flex: none;
+  }
+  .board.is-open .tile__name {
+    font-size: 16px;
+  }
+  .board.is-open .tile__blurb {
+    display: block;
+    font-size: 12px;
+    max-width: none;
+  }
+  .board.is-open .tn-full {
+    display: inline;
+  }
+  .board.is-open .tn-short {
+    display: none;
+  }
+}
+@media (min-width: 860px) and (max-height: 700px) {
+  .board.is-open .tile__blurb {
+    display: none;
+  }
+}
+
+/* ───────── Açılan pencere içeriği ───────── */
+/* Mutlak konumlu: içerik hiçbir zaman bloğun (ve ızgara satırının) boyunu belirlemez.
+   Geçiş sırasında eski içerik kısa süre kalsa bile şerit blokları uzamaz. */
+.block__panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+.panel-scroll {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.tool {
+  --pad: 16px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--pad) var(--pad) 0;
+}
+.tool__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding-bottom: 14px;
+}
+.tool__title-wrap {
+  order: 1;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tool__title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+}
+.tool__close {
+  order: 2;
+}
+.tool__head .example-chips {
+  order: 3;
+  flex-basis: 100%;
+}
+.example-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.example-chips__label {
+  font-size: var(--fs-foot);
+  color: var(--ink-3);
+}
+.chip-btn {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  transition: background-color 0.15s, transform 0.15s;
+}
+.chip-btn:hover {
+  background: var(--surface-2);
+}
+.chip-btn:active {
+  transform: scale(0.96);
+}
+
+.tool__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 320px;
+  padding: 22px 14px 18px;
+  overflow: hidden;
+  background: var(--stage);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+}
+.tool__stage::before {
+  /* araç renginde ince üst çizgi */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 56px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  transform: translateX(-50%);
+  background: var(--tint);
+}
+.tool__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  padding: 18px 0 20px;
+}
+.actionbar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin: auto calc(var(--pad) * -1) 0;
+  padding: 12px var(--pad) calc(12px + var(--safe-bottom));
+  background: rgba(29, 29, 31, 0.86);
+  -webkit-backdrop-filter: var(--blur-bar);
+  backdrop-filter: var(--blur-bar);
+  border-top: 1px solid var(--hairline);
+}
+.actionbar__inner {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.actionbar__secondary {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.actionbar__note {
+  font-size: var(--fs-foot);
+  color: var(--ink-2);
+  text-align: center;
+}
+
+/* Pencere genişliğine göre ölçüler (ekran değil, pencere ölçülür) */
+@container panel (min-width: 560px) {
+  .tool {
+    --pad: 24px;
+  }
+  .card-stage {
+    --cw: 104px;
+    --cw-table: 150px;
+  }
+  .table:not(.table--duel) {
+    --cw-table: 180px;
+  }
+  .wheel-wrap {
+    width: min(100%, 400px);
+  }
+  .teams {
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  }
+  .result__value {
+    font-size: 48px;
+  }
+}
+
+/* geniş pencere: sahne solda sabit, ayarlar sağda kendi içinde kayar */
+@container panel (min-width: 880px) {
+  .tool {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 400px);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'head head'
+      'stage panel'
+      'action panel';
+    column-gap: 24px;
+    padding-bottom: 0;
+  }
+  .panel-scroll {
+    overflow: hidden;
+  }
+  .tool__head {
+    grid-area: head;
+    flex-wrap: nowrap;
+  }
+  .tool__head .example-chips {
+    order: 2;
+    flex-basis: auto;
+  }
+  .tool__close {
+    order: 3;
+  }
+  .tool__stage {
+    grid-area: stage;
+    min-height: 0;
+    padding: 28px 24px;
+  }
+  .tool__panel {
+    grid-area: panel;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 6px 24px 0;
+  }
+  .actionbar {
+    grid-area: action;
+    position: static;
+    margin: 0;
+    padding: 16px 0 20px;
+    background: none;
+    border: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .card-stage {
+    --cw: 112px;
+    --cw-table: 160px;
+  }
+  .table:not(.table--duel) {
+    --cw-table: 190px;
+  }
+  .wheel-wrap {
+    width: min(100%, 440px, calc(100dvh - 340px));
+    min-width: 240px;
+  }
+}

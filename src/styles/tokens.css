@@ -1,0 +1,70 @@
+/* Şansa tasarım değişkenleri — iOS koyu modu temel alınır. */
+:root {
+  color-scheme: dark;
+
+  /* Yüzeyler */
+  --bg: #000000;
+  --surface: #1d1d1f;
+  --surface-2: #2a2a2c;
+  --surface-3: #3d3d3f;
+  --stage: #0d0d0f;
+  --hairline: rgba(244, 241, 234, 0.09);
+  --hairline-strong: rgba(244, 241, 234, 0.16);
+
+  /* Metin: sıcak kırık beyaz */
+  --ink: #f4f1ea;
+  --ink-2: rgba(244, 241, 234, 0.64);
+  --ink-3: rgba(244, 241, 234, 0.42);
+  --ink-on-accent: #ffffff;
+
+  /* Tek eylem rengi */
+  --accent: #0071e3;
+  --accent-press: #0066cc;
+  --accent-soft: rgba(41, 151, 255, 0.16);
+  --focus: #2997ff;
+
+  /* Araç renkleri */
+  --tint-takim: #30d158;
+  --tint-cark: #ff9f0a;
+  --tint-kura: #64d2ff;
+  --tint-para: #e3b341;
+  --tint-zar: #ff453a;
+  --tint-kart: #7d7aff;
+
+  --danger: #ff453a;
+  --warn: #ffd60a;
+  --ok: #30d158;
+
+  /* Tipografi */
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter Variable', 'Segoe UI Variable', system-ui, sans-serif;
+  --fs-largetitle: 34px;
+  --fs-title: 28px;
+  --fs-title2: 22px;
+  --fs-headline: 17px;
+  --fs-body: 17px;
+  --fs-callout: 16px;
+  --fs-sub: 15px;
+  --fs-foot: 13px;
+  --fs-cap: 12px;
+
+  /* Ölçü */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 26px;
+  --r-block: 24px;
+  --r-pill: 999px;
+  --gutter: 16px;
+  --tap: 44px;
+
+  /* Derinlik: yalnızca nesneler ve yüzen çubuklar */
+  --shadow-object: 0 18px 40px -12px rgba(0, 0, 0, 0.75), 0 4px 10px rgba(0, 0, 0, 0.45);
+  --blur-bar: saturate(180%) blur(20px);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --tabbar-h: 56px;
+}
