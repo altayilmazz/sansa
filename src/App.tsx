@@ -10,6 +10,7 @@ import { useStore } from './state/store'
 import { applyTheme, resolveTheme } from './state/theme'
 import { TOOLS } from './state/tools'
 import { Icon, type IconName } from './ui/Icon'
+import { Translator } from './ui/Translator'
 
 const LINKS: { route: Route; label: string; icon: IconName }[] = [
   { route: { name: 'home' }, label: 'Araçlar', icon: 'grid' },
@@ -84,6 +85,7 @@ export function App() {
         {route.name === 'settings' && <Settings />}
       </main>
       <Dock route={route} />
+      <Translator lang={settings.lang} />
     </MotionConfig>
   )
 }

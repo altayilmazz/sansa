@@ -13,6 +13,11 @@
   --tint-kart: #7d7aff;
   --tint-mayin: #ff6b6b;
   --tint-sayi: #5ac8fa;
+  --tint-sise: #34c759;
+  --tint-parmak: #ff9f0a;
+  --tint-rulet: #ff453a;
+  --tint-yaris: #ffd60a;
+  --tint-satranc: #bf5af2;
 
   /* Tipografi */
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter Variable', 'Segoe UI Variable', system-ui, sans-serif;
@@ -58,6 +63,11 @@
   --tint-kart: #d1d1d6;
   --tint-mayin: #d1d1d6;
   --tint-sayi: #d1d1d6;
+  --tint-sise: #d1d1d6;
+  --tint-parmak: #d1d1d6;
+  --tint-rulet: #d1d1d6;
+  --tint-yaris: #d1d1d6;
+  --tint-satranc: #d1d1d6;
 
   --bg: #000000;
   --surface: #1d1d1f;
@@ -149,6 +159,16 @@
   --g-m2: #48484a;
   --g-s1: #3a3a3c;
   --g-s2: #d1d1d6;
+  --g-b1: #8e8e93;
+  --g-b2: #d1d1d6;
+  --g-f1: #8e8e93;
+  --g-f2: #d1d1d6;
+  --g-u1: #48484a;
+  --g-u2: #d1d1d6;
+  --g-h1: #8e8e93;
+  --g-h2: #d1d1d6;
+  --g-c1x: #d1d1d6;
+  --g-c2x: #48484a;
 }
 
 /* ───────── Açık ───────── */
@@ -245,6 +265,16 @@
   --g-m2: #2563eb;
   --g-s1: #2563eb;
   --g-s2: #ffffff;
+  --g-b1: #2563eb;
+  --g-b2: #93b4f5;
+  --g-f1: #1d1d1f;
+  --g-f2: #2563eb;
+  --g-u1: #1d1d1f;
+  --g-u2: #8e8e93;
+  --g-h1: #2563eb;
+  --g-h2: #1d1d1f;
+  --g-c1x: #f5f7fb;
+  --g-c2x: #1d1d1f;
 }
 
 /* ───────── Özel: Claude'un sıcak koyu paleti ───────── */
@@ -341,6 +371,16 @@
   --g-m2: #d97757;
   --g-s1: #d97757;
   --g-s2: #faf9f5;
+  --g-b1: #d97757;
+  --g-b2: #ece6d6;
+  --g-f1: #ece6d6;
+  --g-f2: #d97757;
+  --g-u1: #d97757;
+  --g-u2: #ece6d6;
+  --g-h1: #d97757;
+  --g-h2: #ece6d6;
+  --g-c1x: #faf9f5;
+  --g-c2x: #3b3a36;
 }
 
 /* Açık temada durum çubuğu yazısı beyaz kalır (iOS "black-translucent"); üstte ince koyu şerit okunurluğu korur. */

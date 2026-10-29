@@ -3,6 +3,7 @@ import type { Entry } from '../lib/entries'
 import { uid } from '../lib/random'
 import { isEntryList, isObj, isStr, load, save } from '../lib/storage'
 import { THEME_PREFS, type ThemePref } from './theme'
+import { isLang, type Lang } from './i18n'
 import { isToolId, type ToolId } from './tools'
 
 export type MotionPref = 'sistem' | 'azalt' | 'tam'
@@ -11,20 +12,22 @@ export interface Settings {
   sound: boolean
   motion: MotionPref
   theme: ThemePref
+  lang: Lang
 }
 
-export const DEFAULT_SETTINGS: Settings = { sound: false, motion: 'sistem', theme: 'sistem' }
+export const DEFAULT_SETTINGS: Settings = { sound: false, motion: 'sistem', theme: 'sistem', lang: 'tr' }
 
 const isSettings = (v: unknown): v is Settings =>
   isObj(v) &&
   typeof v.sound === 'boolean' &&
   ['sistem', 'azalt', 'tam'].includes(v.motion as string) &&
-  (v.theme === undefined || THEME_PREFS.includes(v.theme as ThemePref))
+  (v.theme === undefined || THEME_PREFS.includes(v.theme as ThemePref)) &&
+  (v.lang === undefined || isLang(v.lang))
 
 /** Eski kayıtlarda artık kullanılmayan alanlar (ada, sincap) olabilir; yalnızca bilinenler alınır. */
 function loadSettings(): Settings {
   const s = load('settings', DEFAULT_SETTINGS, isSettings)
-  return { sound: s.sound, motion: s.motion, theme: s.theme ?? DEFAULT_SETTINGS.theme }
+  return { sound: s.sound, motion: s.motion, theme: s.theme ?? DEFAULT_SETTINGS.theme, lang: s.lang ?? DEFAULT_SETTINGS.lang }
 }
 
 export interface SavedList {

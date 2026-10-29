@@ -1954,3 +1954,337 @@ textarea.field {
 .numbers li {
   line-height: 1;
 }
+
+/* Şişe çevirmece */
+.bottle-stage {
+  --bottle: var(--accent);
+}
+.bottle-hit {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 340px);
+  aspect-ratio: 1;
+  background: none;
+  border: 0;
+}
+.bottle {
+  width: 34%;
+  overflow: visible;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.35));
+}
+.bottle__body {
+  fill: var(--bottle);
+}
+.bottle__cap {
+  fill: color-mix(in srgb, var(--bottle) 45%, #000);
+}
+.bottle__label {
+  fill: rgba(255, 255, 255, 0.82);
+}
+.bottle__shine {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.bottle__mark {
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  border: 2px dashed var(--hairline-strong);
+  opacity: 0.6;
+  transition: border-color 0.3s, opacity 0.3s;
+}
+.bottle__mark.is-on {
+  border-color: var(--accent);
+  opacity: 1;
+}
+
+/* Parmak seçici */
+.finger-field {
+  position: relative;
+  align-self: stretch;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: pointer;
+}
+.finger {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  margin: -48px 0 0 -48px;
+  border-radius: 50%;
+  background: var(--c);
+  opacity: 0.9;
+  pointer-events: none;
+  transition: transform 0.35s var(--ease-out), opacity 0.3s;
+  animation: finger-in 0.25s var(--ease-out);
+}
+.finger__ring {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 4px solid var(--c);
+  animation: finger-wait var(--t) linear forwards;
+}
+.finger.is-win {
+  transform: scale(1.5);
+  opacity: 1;
+  box-shadow: 0 0 0 10px color-mix(in srgb, var(--c) 40%, transparent), 0 0 40px var(--c);
+}
+.finger.is-win .finger__ring,
+.finger.is-out .finger__ring {
+  animation: none;
+  opacity: 0;
+}
+.finger.is-out {
+  transform: scale(0.6);
+  opacity: 0.2;
+}
+.finger__hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  text-align: center;
+}
+@keyframes finger-in {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+@keyframes finger-wait {
+  from {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Rus ruleti */
+.rulet {
+  position: relative;
+  width: min(100%, 300px);
+  aspect-ratio: 1;
+}
+.rulet__cyl {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.4));
+}
+.rulet__body {
+  fill: var(--surface-3);
+  stroke: var(--hairline-strong);
+  stroke-width: 2;
+}
+.rulet__hub {
+  fill: var(--surface);
+  stroke: var(--hairline-strong);
+  stroke-width: 2;
+}
+.rulet__hole {
+  fill: var(--stage);
+  stroke: var(--hairline-strong);
+  stroke-width: 2;
+}
+.rulet__hole.is-live {
+  fill: var(--danger);
+}
+.rulet__pointer {
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  width: 0;
+  height: 0;
+  margin-left: -9px;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 16px solid var(--ink);
+  z-index: 2;
+}
+.rulet__flash {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  pointer-events: none;
+}
+.rulet__flash.is-bang {
+  background: color-mix(in srgb, var(--danger) 75%, transparent);
+  color: #fff;
+}
+.rulet__flash.is-click {
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  color: var(--ink);
+  font-size: 30px;
+}
+
+/* At yarışı */
+.stage-body.race-stage {
+  gap: 10px;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding-top: 38px;
+}
+.race__status,
+.chess__status {
+  text-align: center;
+  font-size: var(--fs-callout);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.chess__status.is-over {
+  color: var(--ink);
+}
+.race {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 160px;
+  max-height: 440px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(var(--n), minmax(0, 1fr));
+  gap: 6px;
+}
+.race__finish {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  border-radius: 4px;
+  background: repeating-conic-gradient(var(--ink) 0 25%, transparent 0 50%) 0 0 / 10px 10px;
+  opacity: 0.55;
+}
+.lane {
+  position: relative;
+  min-height: 0;
+  padding-right: 16px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  transition: box-shadow 0.3s, background-color 0.3s;
+}
+.lane.is-marked {
+  box-shadow: inset 0 0 0 1.5px var(--ink-3);
+}
+.lane.is-win {
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface-2));
+  box-shadow: inset 0 0 0 2px var(--accent), 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.lane__track {
+  position: relative;
+  height: 100%;
+  margin-right: 34px;
+}
+.horse {
+  position: absolute;
+  top: 50%;
+  height: min(32px, 86%);
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+}
+.horse__btn {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 50%;
+  background: var(--c);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  touch-action: manipulation;
+}
+.lane.is-marked .horse__btn {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.race__podium {
+  text-align: center;
+  font-size: var(--fs-sub);
+  color: var(--ink-2);
+}
+
+/* Hızlı satranç */
+.chess-stage {
+  gap: 10px;
+}
+.chess {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  width: min(100%, 360px, calc(100dvh - 380px));
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-object);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.sq {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--ink) 16%, var(--surface));
+  container-type: size;
+}
+.sq.is-dark {
+  background: color-mix(in srgb, var(--ink) 34%, var(--surface));
+}
+.sq.is-hot {
+  background: color-mix(in srgb, var(--accent) 55%, var(--surface));
+}
+.pc {
+  font-size: 72cqw;
+  line-height: 1;
+  font-family: 'Segoe UI Symbol', 'Apple Symbols', 'Noto Sans Symbols 2', system-ui, sans-serif;
+}
+.pc.is-w {
+  color: #f6f3ea;
+  text-shadow: 0 0 1px #000, 0 0 1px #000, 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+.pc.is-b {
+  color: #17171a;
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.55);
+}
+.pc--btn {
+  font-size: 22px;
+}
+
+/* Ana ekran: dar ekranda 3 sütun, geniş ekranda sağda 2 sütun */
+@media (max-width: 859px) {
+  .board:not(.is-open) .board__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .board:not(.is-open) .board__grid .block {
+    min-height: clamp(84px, 12dvh, 200px);
+  }
+  .board:not(.is-open) .tile__link {
+    padding: 12px;
+  }
+  .board:not(.is-open) .tile__name {
+    font-size: 15px;
+  }
+  .board:not(.is-open) .tile__go {
+    display: none;
+  }
+  .board:not(.is-open) .tile__art {
+    --glyph: 44px;
+  }
+}

@@ -52,7 +52,7 @@ export function TabStrip({ selected, ring, setRing, render }: { selected: ToolId
     const row: ToolId[] = []
     let c = 0
     for (let j = 0; j < SLOTS; j++) row.push(j === pin ? selected : others[mod(k + c++, count)])
-    const hidden = [others[mod(k + SLOTS - 1, count)], others[mod(k + SLOTS, count)]]
+    const hidden = Array.from({ length: count - (SLOTS - 1) }, (_, c) => others[mod(k + SLOTS - 1 + c, count)])
     setRing([...row, ...hidden])
     offset.set(0)
   }

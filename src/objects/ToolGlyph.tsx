@@ -92,6 +92,54 @@ export function ToolGlyph({ tool, size = 28 }: { tool: ToolId; size?: number }) 
           </text>
         </g>
       )}
+      {tool === 'sise' && (
+        <g transform="rotate(35 16 16)">
+          <path d="M13.5 2h5v4c0 2 .6 3 1.8 5 1.6 2.4 2.7 4 2.7 7v8a3 3 0 0 1-3 3h-8a3 3 0 0 1-3-3v-8c0-3 1.1-4.6 2.7-7C12.9 9 13.5 8 13.5 6z" style={f('b1')} />
+          <rect x="12" y="19" width="8" height="7" rx="1.5" style={f('b2')} />
+        </g>
+      )}
+      {tool === 'parmak' && (
+        <g>
+          {[
+            [9, 11, 'f1'],
+            [22, 9, 'f2'],
+            [16, 22, 'f1'],
+          ].map(([x, y, c]) => (
+            <g key={`${x}${y}`}>
+              <circle cx={x as number} cy={y as number} r="6.4" fill="none" style={{ stroke: `var(--g-${c})` }} strokeWidth="1.6" opacity="0.6" />
+              <circle cx={x as number} cy={y as number} r="3.6" style={f(c as string)} />
+            </g>
+          ))}
+        </g>
+      )}
+      {tool === 'rulet' && (
+        <g>
+          <circle cx="16" cy="16" r="13" style={f('u1')} />
+          <circle cx="16" cy="16" r="3" style={f('u2')} />
+          {[0, 1, 2, 3, 4, 5].map((i) => {
+            const a = (i * 60 * Math.PI) / 180
+            return <circle key={i} cx={16 + 8 * Math.sin(a)} cy={16 - 8 * Math.cos(a)} r="2.6" style={f(i === 0 ? 'u2' : 'c0')} opacity={i === 0 ? 1 : 0.9} />
+          })}
+        </g>
+      )}
+      {tool === 'yaris' && (
+        <g>
+          <rect x="3" y="6" width="26" height="6" rx="3" style={f('h2')} opacity="0.35" />
+          <rect x="3" y="14" width="26" height="6" rx="3" style={f('h2')} opacity="0.35" />
+          <rect x="3" y="22" width="26" height="6" rx="3" style={f('h2')} opacity="0.35" />
+          <circle cx="22" cy="9" r="3.4" style={f('h1')} />
+          <circle cx="14" cy="17" r="3.4" style={f('h2')} />
+          <circle cx="9" cy="25" r="3.4" style={f('h1')} />
+        </g>
+      )}
+      {tool === 'satranc' && (
+        <g>
+          <rect x="3" y="3" width="26" height="26" rx="5" style={f('c2x')} />
+          {[0, 1, 2, 3].flatMap((r) => [0, 1, 2, 3].map((c) => ((r + c) % 2 === 0 ? <rect key={`${r}${c}`} x={3 + c * 6.5} y={3 + r * 6.5} width="6.5" height="6.5" style={f('c1x')} opacity="0.9" /> : null)))}
+          <path d="M16 7l1.6 3.4h2L19 13h-6l-.6-2.6h2z" style={f('c0')} />
+          <rect x="12" y="13" width="8" height="9" rx="2" style={f('c0')} />
+        </g>
+      )}
     </svg>
   )
 }

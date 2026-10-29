@@ -1,6 +1,7 @@
 import { sfx } from '../features/sound'
 import { storageAvailable } from '../lib/storage'
 import { HISTORY_LIMIT, useStore, type MotionPref } from '../state/store'
+import type { Lang } from '../state/i18n'
 import type { ThemePref } from '../state/theme'
 import { Group, Row, Segmented, Switch } from '../ui/controls'
 
@@ -25,6 +26,20 @@ export function Settings() {
               { value: 'acik', label: 'Açık' },
               { value: 'koyu', label: 'Koyu' },
               { value: 'ozel', label: 'Özel' },
+            ]}
+          />
+        </Row>
+      </Group>
+
+      <Group title="Dil" id="ayar-dil">
+        <Row label="Dil" hint="Language">
+          <Segmented<Lang>
+            label="Dil"
+            value={settings.lang}
+            onChange={(v) => setSettings({ lang: v })}
+            options={[
+              { value: 'tr', label: 'Türkçe' },
+              { value: 'en', label: 'English' },
             ]}
           />
         </Row>
