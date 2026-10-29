@@ -7,7 +7,7 @@ import { href } from '../state/router'
 import { TOOL_ORDER, TOOLS, type ToolId } from '../state/tools'
 import { TeamsTool } from '../tools/TeamsTool'
 import { Icon } from '../ui/Icon'
-import { SLOTS, TabStrip, useRing } from './TabStrip'
+import { SLOTS, TabStrip, useRing, wantSlot } from './TabStrip'
 import { ToolHostContext } from '../ui/ToolHost'
 
 const WheelTool = lazy(() => import('../tools/WheelTool').then((m) => ({ default: m.WheelTool })))
@@ -203,7 +203,12 @@ export function Board({ selected }: { selected: ToolId | null }) {
         <div className="board__grid">
           {!open &&
             TOOL_ORDER.map((id) => (
-              <section key={id} className="block block--tile" style={{ ...radii(24, 24, 24, 24), '--tint': TOOLS[id].tint } as CSSProperties}>
+              <section
+                key={id}
+                className="block block--tile"
+                style={{ ...radii(24, 24, 24, 24), '--tint': TOOLS[id].tint } as CSSProperties}
+                onClickCapture={(e) => wantSlot(id, e.clientX, window.innerWidth)}
+              >
                 <div className="block__tile">
                   <TileFace id={id} />
                 </div>

@@ -8,9 +8,19 @@ export const SLOTS = 6
 
 const mod = (n: number, m: number) => ((n % m) + m) % m
 
+/** Ana ekran ızgarasından seçilen araç, dokunulduğu yatay konumdaki yuvaya yerleşir. */
+let wanted: { id: ToolId; slot: number } | null = null
+export function wantSlot(id: ToolId, x: number, width: number) {
+  wanted = { id, slot: Math.max(0, Math.min(SLOTS - 1, Math.floor((x / Math.max(1, width)) * SLOTS))) }
+}
+
 /** Seçili araç görünen yuvalardan birinde durmalıdır; değilse halka döndürülür. */
 function normalize(ring: ToolId[], selected: ToolId): ToolId[] {
   const at = ring.indexOf(selected)
+  if (wanted && wanted.id === selected && at !== wanted.slot) {
+    const shift = at - wanted.slot
+    return ring.map((_, i) => ring[mod(i + shift, ring.length)])
+  }
   if (at >= 0 && at < SLOTS) return ring
   const shift = at < 0 ? 0 : at - (SLOTS - 1)
   return ring.map((_, i) => ring[(i + shift) % ring.length])
@@ -23,6 +33,7 @@ function normalize(ring: ToolId[], selected: ToolId): ToolId[] {
  */
 export function useRing(selected: ToolId | null) {
   const [ring, setRing] = useState<ToolId[]>(() => [...TOOL_ORDER])
+  if (!selected) wanted = null
   const sel = selected ?? TOOL_ORDER[0]
   const norm = normalize(ring, sel)
   if (norm !== ring) setRing(norm)
