@@ -12,7 +12,6 @@ export interface Example {
   names?: string[]
   teams?: number
   winners?: number
-  players?: [string, string]
 }
 
 export const EXAMPLES: Example[] = [
@@ -38,13 +37,6 @@ export const EXAMPLES: Example[] = [
     line: 'Dört kişiden biri.',
     names: ['Selin', 'Mert', 'Ece', 'Onur'],
     winners: 1,
-  },
-  {
-    id: 'kimbaslar',
-    tool: 'para',
-    title: 'Kim başlar?',
-    line: 'İki kişi, yazı tura.',
-    players: ['Zeynep', 'Emre'],
   },
 ]
 

@@ -8,13 +8,13 @@ import { useBusy, useMounted, useReducedMotion, wait } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { CardFan } from '../objects/CardFan'
 import { CardBack, CardFace } from '../objects/PlayingCard'
-import { Button, Group, Notice, Row, Segmented } from '../ui/controls'
-import { nameOf, PlayersForm, Scoreboard, useMatch } from '../ui/Match'
+import { Button, Notice } from '../ui/controls'
+import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
-type Mode = 'tek' | 'mac'
-const isMode = (v: unknown): v is Mode => v === 'tek' || v === 'mac'
+const isBool = (v: unknown): v is boolean => typeof v === 'boolean'
 const FAN = 7
+const PLAYERS = ['1. oyuncu', '2. oyuncu'] as const
 
 /** Masadaki açık kart: önce yelpazeden yuvaya uçar, sonra dönerek açılır. */
 function TableCard({ card, reduced, highlight }: { card: Card; reduced: boolean; highlight?: boolean }) {
@@ -47,14 +47,12 @@ function Slot({ label, card, reduced, highlight, active }: { label?: string; car
 }
 
 export function CardTool() {
-  const [mode, setMode] = usePersistent<Mode>('kart:mode', 'tek', isMode)
-  const match = useMatch('kart')
+  const [duel, setDuel] = usePersistent('kart:duel2', false, isBool)
   const deck = useRef<Deck>(null as unknown as Deck)
   if (!deck.current) deck.current = new Deck()
   const [, setVersion] = useState(0)
   const refresh = () => setVersion((v) => v + 1)
   const [single, setSingle] = useState<Card | null>(null)
-  const [recent, setRecent] = useState<Card[]>([])
   const [pair, setPair] = useState<{ a: Card | null; b: Card | null }>({ a: null, b: null })
   const [outcome, setOutcome] = useState<RoundOutcome | null>(null)
   const [live, setLive] = useState('')
@@ -62,31 +60,27 @@ export function CardTool() {
   const reduced = useReducedMotion()
   const mounted = useMounted()
   const { record } = useStore()
-  const matchKey = useRef(uid())
 
-  const isMatch = mode === 'mac'
-  const over = isMatch && match.winner !== null
-  const turn: Side | null = !isMatch || over ? null : pair.a && pair.b ? null : pair.a ? 'b' : 'a'
-  const roundDone = isMatch && !!pair.a && !!pair.b
+  const turn: Side | null = !duel ? null : pair.a && pair.b ? null : pair.a ? 'b' : 'a'
+  const roundDone = duel && !!pair.a && !!pair.b
   const remaining = deck.current.remaining
-  const need = isMatch ? (roundDone ? 2 : turn === 'b' ? 1 : 2) : 1
+  const need = duel ? (roundDone ? 2 : turn === 'b' ? 1 : 2) : 1
   const short = remaining < need
   const fan = deck.current.peekTop(Math.min(FAN, remaining))
+  const name = (s: Side) => PLAYERS[s === 'a' ? 0 : 1]
 
   const play = (index: number) =>
     run(async () => {
-      if (over || short) return
-      if (isMatch && roundDone) return
+      if (short || roundDone) return
       const card = deck.current.drawAt(index)
       refresh()
       sfx.card()
       haptic(10)
       setLive('')
-      if (!isMatch) {
+      if (!duel) {
         setSingle(card)
         await wait(reduced ? 150 : 1050)
         if (!mounted.current) return
-        setRecent((r) => [card, ...r].slice(0, 6))
         sfx.reveal()
         setLive(`Çekilen kart: ${cardName(card)}. Destede ${deck.current.remaining} kart kaldı.`)
         record(uid(), { tool: 'kart', title: cardName(card), detail: `Tek kart · destede ${deck.current.remaining} kart kaldı` })
@@ -98,7 +92,7 @@ export function CardTool() {
       await wait(reduced ? 150 : 1050)
       if (!mounted.current) return
       if (side === 'a') {
-        setLive(`${match.names[0]}: ${cardName(card)}. Sıra şimdi ${match.names[1]} adlı oyuncuda.`)
+        setLive(`${PLAYERS[0]}: ${cardName(card)}. Sıra şimdi ${PLAYERS[1]} adlı oyuncuda.`)
         return
       }
       const a = next.a as Card
@@ -106,23 +100,13 @@ export function CardTool() {
       setOutcome(o)
       if (o === 'berabere') {
         sfx.tick()
-        setLive(`${match.names[0]} ${cardName(a)}, ${match.names[1]} ${cardName(card)}. Aynı değer: berabere, tur yeniden oynanır.`)
+        setLive(`${PLAYERS[0]} ${cardName(a)}, ${PLAYERS[1]} ${cardName(card)}. Aynı değer: berabere, yeniden oynanır.`)
         return
       }
-      const { score, winner } = match.push(o)
-      sfx.reveal()
-      if (winner) {
-        const w = nameOf(match, winner)
-        sfx.win()
-        setLive(`${match.names[0]} ${cardName(a)}, ${match.names[1]} ${cardName(card)}. Karşılaşmayı ${w} kazandı.`)
-        record(matchKey.current, {
-          tool: 'kart',
-          title: `${w} kazandı`,
-          detail: `${match.names[0]}: ${cardName(a)} – ${match.names[1]}: ${cardName(card)}${match.format === 'ucte-iki' ? ` · 3’te 2, ${score.a}–${score.b}` : ''}`,
-        })
-      } else {
-        setLive(`${match.names[0]} ${cardName(a)}, ${match.names[1]} ${cardName(card)}. Turu ${nameOf(match, o)} aldı. Skor ${score.a}–${score.b}.`)
-      }
+      const w = name(o)
+      sfx.win()
+      setLive(`${PLAYERS[0]} ${cardName(a)}, ${PLAYERS[1]} ${cardName(card)}. ${w} kazandı.`)
+      record(uid(), { tool: 'kart', title: `${w} kazandı`, detail: `${PLAYERS[0]}: ${cardName(a)} – ${PLAYERS[1]}: ${cardName(card)}` })
     })
 
   const nextRound = () => {
@@ -131,11 +115,10 @@ export function CardTool() {
     setLive('Yeni tur: kartlar masadan kaldırıldı.')
   }
 
-  const newMatch = () => {
-    match.reset()
-    matchKey.current = uid()
-    nextRound()
-    setLive('Yeni karşılaşma hazır.')
+  const clearTable = () => {
+    setSingle(null)
+    setPair({ a: null, b: null })
+    setOutcome(null)
   }
 
   const shuffle = () => {
@@ -147,109 +130,89 @@ export function CardTool() {
   const resetDeck = () => {
     deck.current.reset()
     refresh()
-    setSingle(null)
-    setRecent([])
-    if (isMatch) newMatch()
+    clearTable()
     sfx.whoosh()
     setLive('Deste sıfırlandı: 52 kart karıştırıldı.')
   }
 
-  const roundLine = !isMatch
+  const roundLine = !duel
     ? single && !busy
       ? cardName(single)
       : ''
-    : over
-      ? `Karşılaşmayı ${nameOf(match, match.winner as Side)} kazandı`
-      : outcome === 'berabere'
-        ? 'Aynı değer: berabere. Tur yeniden oynanır.'
-        : outcome
-          ? `Bu turu ${nameOf(match, outcome)} aldı`
-          : turn
-            ? `Sıra ${nameOf(match, turn)} — bir kart seç`
-            : ''
+    : outcome === 'berabere'
+      ? 'Aynı değer: berabere. Tur yeniden oynanır.'
+      : outcome
+        ? `${name(outcome)} kazandı`
+        : turn
+          ? `Sıra ${name(turn)} — bir kart seç`
+          : ''
 
   const stage = (
-    <div className="card-stage">
-      {isMatch && <Scoreboard match={match} highlight={outcome && outcome !== 'berabere' ? outcome : null} />}
-      <LayoutGroup>
-        <div className={`table${isMatch ? ' table--duel' : ''}`}>
-          {isMatch ? (
-            <>
-              <Slot label={match.names[0]} card={pair.a} reduced={reduced} highlight={outcome === 'a'} active={turn === 'a'} />
-              <Slot label={match.names[1]} card={pair.b} reduced={reduced} highlight={outcome === 'b'} active={turn === 'b'} />
-            </>
-          ) : (
-            <Slot card={single} reduced={reduced} />
-          )}
-        </div>
-        <div className="stage-result stage-result--tight" aria-hidden="true">
-          <AnimatePresence mode="wait">
-            {roundLine ? (
-              <motion.p key={roundLine} className={`result__line${outcome === 'berabere' ? ' is-tie' : ''}`} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                {roundLine}
-              </motion.p>
-            ) : (
-              <motion.p key="hint" className="stage-hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                Bir kartı seç ya da yukarı fırlat
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
-        {!short && !over && !roundDone ? (
-          <CardFan cards={fan} onPlay={play} disabled={busy} reduced={reduced} />
-        ) : (
-          <div className="fan fan--placeholder" aria-hidden="true" />
-        )}
-      </LayoutGroup>
-      <p className="deck-count">
-        Destede <strong>{remaining}</strong> kart
-      </p>
-      {!isMatch && recent.length > 1 && (
-        <p className="recent-cards">
-          Önceki: {recent.slice(1).map((c) => cardName(c)).join(', ')}
-        </p>
-      )}
-    </div>
-  )
-
-  const controls = (
     <>
-      <Group title="Mod" id="kart-mod">
-        <Row label="Oyun">
-          <Segmented<Mode>
-            label="Oyun"
-            value={mode}
-            onChange={(m) => {
-              setMode(m)
-              newMatch()
-              setSingle(null)
-            }}
-            disabled={busy}
-            options={[
-              { value: 'tek', label: 'Tek kart' },
-              { value: 'mac', label: 'Yüksek kart' },
-            ]}
-          />
-        </Row>
-      </Group>
-      {isMatch && (
-        <Group title="Oyuncular" id="kart-oyuncu">
-          <PlayersForm match={match} disabled={busy} />
-        </Group>
-      )}
-      <Group title="Deste" id="kart-deste">
-        <Row label="Kalan kartları karıştır">
-          <Button variant="plain" icon="shuffle" onClick={shuffle} disabled={busy || remaining < 2}>
-            Karıştır
-          </Button>
-        </Row>
-        <Row label="Desteyi sıfırla" hint="Çekilen kartlar desteye döner ve 52 kart yeniden karıştırılır.">
-          <Button variant="plain" icon="refresh" onClick={resetDeck} disabled={busy || remaining === 52}>
-            Sıfırla
-          </Button>
-        </Row>
-      </Group>
+      <div className="stage-body card-stage">
+        <LayoutGroup>
+          <div className={`table${duel ? ' table--duel' : ''}`}>
+            {duel ? (
+              <>
+                <Slot label={PLAYERS[0]} card={pair.a} reduced={reduced} highlight={outcome === 'a'} active={turn === 'a'} />
+                <Slot label={PLAYERS[1]} card={pair.b} reduced={reduced} highlight={outcome === 'b'} active={turn === 'b'} />
+              </>
+            ) : (
+              <Slot card={single} reduced={reduced} />
+            )}
+          </div>
+          <div className="stage-result stage-result--tight" aria-hidden="true">
+            <AnimatePresence mode="wait">
+              {roundLine ? (
+                <motion.p key={roundLine} className={`result__line${outcome === 'berabere' ? ' is-tie' : ''}`} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                  {roundLine}
+                </motion.p>
+              ) : (
+                <motion.p key="hint" className="stage-hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  Bir kartı seç ya da yukarı fırlat
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+          {!short && !roundDone ? <CardFan cards={fan} onPlay={play} disabled={busy} reduced={reduced} /> : <div className="fan fan--placeholder" aria-hidden="true" />}
+        </LayoutGroup>
+        <p className="deck-count">
+          Destede <strong>{remaining}</strong> kart
+        </p>
+      </div>
       {short && <Notice tone="warn">Destede yeterli kart kalmadı. Devam etmek için desteyi sıfırla.</Notice>}
+      <StageBar
+        left={
+          <>
+            <RoundButton
+              icon="card"
+              label="Tek kart"
+              on={!duel}
+              disabled={busy}
+              onClick={() => {
+                setDuel(false)
+                clearTable()
+              }}
+            />
+            <RoundButton
+              icon="duel"
+              label="Yüksek kart karşılaşması"
+              on={duel}
+              disabled={busy}
+              onClick={() => {
+                setDuel(true)
+                clearTable()
+              }}
+            />
+          </>
+        }
+        right={
+          <>
+            <RoundButton icon="shuffle" label="Kalan kartları karıştır" disabled={busy || remaining < 2} onClick={shuffle} />
+            <RoundButton icon="refresh" label="Desteyi sıfırla" disabled={busy || remaining === 52} onClick={resetDeck} />
+          </>
+        }
+      />
     </>
   )
 
@@ -257,17 +220,13 @@ export function CardTool() {
     <Button variant="primary" size="lg" block icon="refresh" onClick={resetDeck} disabled={busy}>
       Desteyi sıfırla
     </Button>
-  ) : over ? (
-    <Button variant="primary" size="lg" block icon="refresh" onClick={newMatch}>
-      Yeni karşılaşma
-    </Button>
   ) : roundDone ? (
     <Button variant="primary" size="lg" block onClick={nextRound} disabled={busy}>
       {outcome === 'berabere' ? 'Turu yeniden oyna' : 'Sonraki tur'}
     </Button>
   ) : (
     <Button variant="primary" size="lg" block onClick={() => play(0)} disabled={busy}>
-      {busy ? 'Açılıyor…' : turn ? `${nameOf(match, turn)} için kart çek` : 'Kart çek'}
+      {busy ? 'Açılıyor…' : turn ? `${name(turn)} için kart çek` : 'Kart çek'}
     </Button>
   )
 
@@ -275,18 +234,21 @@ export function CardTool() {
     <ToolScaffold
       tool="kart"
       stage={stage}
-      controls={controls}
       action={action}
       live={live}
       rules={
-        isMatch
+        duel
           ? [
               'Standart 52 kartlık deste, joker yok.',
               'Değer sırası 2’den As’a yükselir; As en yüksektir.',
               'Türler arasında üstünlük yoktur; aynı değer berabere sayılır ve tur yeniden oynanır.',
-              match.format === 'tek' ? 'Tek tur oynanır.' : 'İki turu ilk kazanan karşılaşmayı alır.',
+              'Sol alttaki iki düğme tek kart ile yüksek kart karşılaşması arasında geçer; sağ alttakiler kalan kartları karıştırır ve desteyi sıfırlar.',
             ]
-          : ['Standart 52 kartlık deste, joker yok.', 'Çekilen kart deste sıfırlanana kadar yeniden çıkmaz.']
+          : [
+              'Standart 52 kartlık deste, joker yok.',
+              'Çekilen kart deste sıfırlanana kadar yeniden çıkmaz.',
+              'Sol alttaki iki düğme tek kart ile yüksek kart karşılaşması arasında geçer; sağ alttakiler kalan kartları karıştırır ve desteyi sıfırlar.',
+            ]
       }
     />
   )

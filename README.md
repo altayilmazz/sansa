@@ -37,12 +37,12 @@ src/
 
 ## Tasarım
 
-- Koyu, iOS koyu moduna yakın yüzeyler (`#000`, `#1c1c1e`, `#2c2c2e`) ve sıcak kırık beyaz metin (`#f4f1ea`).
-- Tek eylem rengi (`#0a84ff`); her aracın sahnesinde küçük bir yardımcı renk.
+- Üç tema (Ayarlar → Görünüm): Sistem/Koyu (iOS koyu modu), Açık ve Özel (Claude'un sıcak koyu paleti, turuncu vurgu). Tema `<html data-theme>` ile seçilir; çark, kura kasesi, biletler ve paralar da temaya göre renk değiştirir (`styles/tokens.css`).
+- Tek eylem rengi; her aracın sahnesinde küçük bir yardımcı renk.
 - Apple cihazlarda SF Pro, diğerlerinde paketle gelen Inter (çevrimdışı çalışır).
 - Araç açıkken üst çubuk kalkar, içerik ekranı doldurur. Altta: seçili sekmeye bağlı araç şeridi (başparmak erişimi), onun altında solda Şansa işareti ve panelin tam ortasında “Ana sayfa” düğmesi. Geçmiş ve Ayarlar ana sayfadaki üst çubuktan açılır.
 - Mobilde ana eylem panelin içindeki alt çubuktadır; masaüstünde sahne solda sabit kalır, ayarlar sağda listelenir.
-- Ana ekran yalnızca altı araç bloğundan oluşur (`pages/Board.tsx`). Geniş ekranda tıklanan blok büyüyerek pencereye dönüşür, diğerleri sağında sütun olur; başka bir bloğa tıklayınca yer değiştirirler. Dar ekranda (<860 px) altı blok içeriğin altına, başparmağın erişeceği yere sekme şeridi olarak dizilir; seçili sekme şeritte kalır ve panel o sekmeden yukarı doğru açılır. Araç adı başlığı yoktur, seçili sekme gösterir. Pencereyi kapatmak için alttaki “Ana sayfa” düğmesi kullanılır. Kurallar ve örnekler, alt çubuktaki ⓘ düğmesinin penceresindedir. Hareket yalnızca görünümdür ve sonuçlara dokunmaz.
+- Ana ekran yalnızca altı araç bloğundan oluşur (`pages/Board.tsx`). Geniş ekranda tıklanan blok büyüyerek pencereye dönüşür, diğerleri sağında sütun olur; başka bir bloğa tıklayınca yer değiştirirler. Dar ekranda (<860 px) altı blok içeriğin altına, başparmağın erişeceği yere sekme şeridi olarak dizilir; seçili sekme şeritte kalır ve panel o sekmeden yukarı doğru açılır. Araç adı başlığı yoktur, seçili sekme gösterir. Pencereyi kapatmak için alttaki “Ana sayfa” düğmesi kullanılır. Kurallar, örnekler, kayıtlı listeler ve listeyi temizleme, alt çubuktaki ⓘ düğmesinin penceresindedir. Girişleri sürükleyip kırmızı çöp alanına bırakarak silebilir, dokunarak düzenleyebilirsin; kura listesi düz yazı olarak alt alta dizilir. Hareket yalnızca görünümdür ve sonuçlara dokunmaz.
 - “Hareketi azalt” sistem tercihi ve uygulama ayarı desteklenir; ses varsayılan olarak kapalıdır.
 
 ## PWA ve çevrimdışı

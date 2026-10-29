@@ -1,7 +1,7 @@
 import { useAnimate } from 'motion/react'
-import { forwardRef, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useRef, type CSSProperties } from 'react'
 import type { Face } from '../lib/rules/coin'
-import { SquirrelEmblem } from './Squirrel'
+import { CoinSymbol, toneVars, type CoinTone, type SymbolId } from './coinStyles'
 
 export interface CoinHandle {
   /** Sonuç önceden belirlenmiştir; animasyon yalnızca bu yüzü gösterecek şekilde biter. */
@@ -10,7 +10,14 @@ export interface CoinHandle {
 
 const mod = (x: number, m: number) => ((x % m) + m) % m
 
-export const Coin = forwardRef<CoinHandle, { size?: number }>(function Coin({ size = 180 }, ref) {
+interface CoinProps {
+  size?: number
+  yazi: CoinTone
+  tura: CoinTone
+  symbol: SymbolId
+}
+
+export const Coin = forwardRef<CoinHandle, CoinProps>(function Coin({ size = 180, yazi, tura, symbol }, ref) {
   const [scope, animate] = useAnimate()
   const rot = useRef(0)
 
@@ -45,7 +52,7 @@ export const Coin = forwardRef<CoinHandle, { size?: number }>(function Coin({ si
   }))
 
   return (
-    <div ref={scope} className="coin" style={{ width: size, height: size }}>
+    <div ref={scope} className="coin" style={{ width: size, height: size, '--coin': `${size}px`, ...toneVars('y', yazi), ...toneVars('t', tura) } as CSSProperties}>
       <div className="coin__shadow" />
       <div className="coin__body">
         {[-1, 0, 1].map((z) => (
@@ -59,7 +66,7 @@ export const Coin = forwardRef<CoinHandle, { size?: number }>(function Coin({ si
         </div>
         <div className="coin__face coin__face--tura">
           <div className="coin__ring">
-            <SquirrelEmblem size={size * 0.42} color="#2d3b4d" />
+            <CoinSymbol id={symbol} size={size * 0.42} color={tura.ink} />
             <span className="coin__word">Tura</span>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { sfx } from '../features/sound'
 import { storageAvailable } from '../lib/storage'
 import { HISTORY_LIMIT, useStore, type MotionPref } from '../state/store'
+import type { ThemePref } from '../state/theme'
 import { Group, Row, Segmented, Switch } from '../ui/controls'
 
 export function Settings() {
@@ -12,6 +13,22 @@ export function Settings() {
       <header className="page__head">
         <h1 className="largetitle">Ayarlar</h1>
       </header>
+
+      <Group title="Görünüm" id="ayar-tema">
+        <Row label="Tema">
+          <Segmented<ThemePref>
+            label="Tema"
+            value={settings.theme}
+            onChange={(v) => setSettings({ theme: v })}
+            options={[
+              { value: 'sistem', label: 'Sistem' },
+              { value: 'acik', label: 'Açık' },
+              { value: 'koyu', label: 'Koyu' },
+              { value: 'ozel', label: 'Özel' },
+            ]}
+          />
+        </Row>
+      </Group>
 
       <Group title="Ses ve hareket" id="ayar-ses">
         <Row label="Ses efektleri" hint="Varsayılan olarak kapalı. Sonuçlar sessizken de ekranda ve ekran okuyucuda açıkça gösterilir.">

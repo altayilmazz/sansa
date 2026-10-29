@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { Entry } from '../lib/entries'
 import { uid } from '../lib/random'
 import { isEntryList, isObj, isStr, load, save } from '../lib/storage'
+import { THEME_PREFS, type ThemePref } from './theme'
 import { isToolId, type ToolId } from './tools'
 
 export type MotionPref = 'sistem' | 'azalt' | 'tam'
@@ -9,16 +10,21 @@ export type MotionPref = 'sistem' | 'azalt' | 'tam'
 export interface Settings {
   sound: boolean
   motion: MotionPref
+  theme: ThemePref
 }
 
-export const DEFAULT_SETTINGS: Settings = { sound: false, motion: 'sistem' }
+export const DEFAULT_SETTINGS: Settings = { sound: false, motion: 'sistem', theme: 'sistem' }
 
-const isSettings = (v: unknown): v is Settings => isObj(v) && typeof v.sound === 'boolean' && ['sistem', 'azalt', 'tam'].includes(v.motion as string)
+const isSettings = (v: unknown): v is Settings =>
+  isObj(v) &&
+  typeof v.sound === 'boolean' &&
+  ['sistem', 'azalt', 'tam'].includes(v.motion as string) &&
+  (v.theme === undefined || THEME_PREFS.includes(v.theme as ThemePref))
 
 /** Eski kayıtlarda artık kullanılmayan alanlar (ada, sincap) olabilir; yalnızca bilinenler alınır. */
 function loadSettings(): Settings {
   const s = load('settings', DEFAULT_SETTINGS, isSettings)
-  return { sound: s.sound, motion: s.motion }
+  return { sound: s.sound, motion: s.motion, theme: s.theme ?? DEFAULT_SETTINGS.theme }
 }
 
 export interface SavedList {

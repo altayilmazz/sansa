@@ -4,9 +4,10 @@ import { setSoundEnabled } from './features/sound'
 import { Board } from './pages/Board'
 import { History } from './pages/History'
 import { Settings } from './pages/Settings'
-import { useReducedMotion } from './state/hooks'
+import { useMedia, useReducedMotion } from './state/hooks'
 import { href, parseRoute, useHash, type Route } from './state/router'
 import { useStore } from './state/store'
+import { applyTheme, resolveTheme } from './state/theme'
 import { TOOLS } from './state/tools'
 import { BrandMark } from './ui/Brand'
 
@@ -45,7 +46,10 @@ export function App() {
   const { settings } = useStore()
   const reduced = useReducedMotion()
 
+  const systemDark = useMedia('(prefers-color-scheme: dark)')
+
   useEffect(() => setSoundEnabled(settings.sound), [settings.sound])
+  useEffect(() => applyTheme(resolveTheme(settings.theme, systemDark)), [settings.theme, systemDark])
   useEffect(() => {
     document.documentElement.dataset.motion = reduced ? 'reduce' : 'full'
   }, [reduced])

@@ -1,28 +1,9 @@
-/* Şansa tasarım değişkenleri — iOS koyu modu temel alınır. */
+/* Şansa tasarım değişkenleri.
+   Üç tema: koyu (varsayılan), açık ve özel (Claude'un sıcak koyu paleti).
+   Tema, <html data-theme="light|dark|special"> ile seçilir. */
+
+/* ───────── Temadan bağımsız değerler ───────── */
 :root {
-  color-scheme: dark;
-
-  /* Yüzeyler */
-  --bg: #000000;
-  --surface: #1d1d1f;
-  --surface-2: #2a2a2c;
-  --surface-3: #3d3d3f;
-  --stage: #0d0d0f;
-  --hairline: rgba(244, 241, 234, 0.09);
-  --hairline-strong: rgba(244, 241, 234, 0.16);
-
-  /* Metin: sıcak kırık beyaz */
-  --ink: #f4f1ea;
-  --ink-2: rgba(244, 241, 234, 0.64);
-  --ink-3: rgba(244, 241, 234, 0.42);
-  --ink-on-accent: #ffffff;
-
-  /* Tek eylem rengi */
-  --accent: #0071e3;
-  --accent-press: #0066cc;
-  --accent-soft: rgba(41, 151, 255, 0.16);
-  --focus: #2997ff;
-
   /* Araç renkleri */
   --tint-takim: #30d158;
   --tint-cark: #ff9f0a;
@@ -30,10 +11,6 @@
   --tint-para: #e3b341;
   --tint-zar: #ff453a;
   --tint-kart: #7d7aff;
-
-  --danger: #ff453a;
-  --warn: #ffd60a;
-  --ok: #30d158;
 
   /* Tipografi */
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter Variable', 'Segoe UI Variable', system-ui, sans-serif;
@@ -57,14 +34,228 @@
   --gutter: 16px;
   --tap: 44px;
 
-  /* Derinlik: yalnızca nesneler ve yüzen çubuklar */
-  --shadow-object: 0 18px 40px -12px rgba(0, 0, 0, 0.75), 0 4px 10px rgba(0, 0, 0, 0.45);
   --blur-bar: saturate(180%) blur(20px);
-
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
 
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --tabbar-h: 56px;
+}
+
+/* ───────── Koyu (varsayılan): iOS koyu modu ───────── */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #000000;
+  --surface: #1d1d1f;
+  --surface-2: #2a2a2c;
+  --surface-3: #3d3d3f;
+  --stage: #0d0d0f;
+  --hairline: rgba(244, 241, 234, 0.09);
+  --hairline-strong: rgba(244, 241, 234, 0.16);
+
+  --ink: #f4f1ea;
+  --ink-2: rgba(244, 241, 234, 0.64);
+  --ink-3: rgba(244, 241, 234, 0.42);
+  --ink-on-accent: #ffffff;
+
+  --accent: #0071e3;
+  --accent-hover: #2491ff;
+  --accent-press: #0066cc;
+  --accent-soft: rgba(41, 151, 255, 0.16);
+  --focus: #2997ff;
+
+  --danger: #ff453a;
+  --danger-soft: rgba(255, 69, 58, 0.16);
+  --danger-ink: #ff8a82;
+  --warn: #ffd60a;
+  --ok: #30d158;
+
+  --nav-bg: rgba(0, 0, 0, 0.82);
+  --hover: rgba(255, 255, 255, 0.045);
+  --chip: rgba(210, 210, 215, 0.16);
+  --scrim: rgba(0, 0, 0, 0.6);
+
+  --notice-info-bg: rgba(10, 132, 255, 0.12);
+  --notice-info-ink: #a9d1ff;
+  --notice-warn-bg: rgba(255, 214, 10, 0.1);
+  --notice-warn-ink: #ffe38a;
+  --notice-error-bg: rgba(255, 69, 58, 0.13);
+  --notice-error-ink: #ffaaa4;
+
+  --shadow-object: 0 18px 40px -12px rgba(0, 0, 0, 0.75), 0 4px 10px rgba(0, 0, 0, 0.45);
+  /* Çark, kase ve bilet paleti */
+  --wheel-1: #ff9f0a;
+  --wheel-1t: #1c1205;
+  --wheel-2: #26262a;
+  --wheel-2t: #f4f1ea;
+  --wheel-3: #efe9dc;
+  --wheel-3t: #1c1c1e;
+  --wheel-4: #c2410c;
+  --wheel-4t: #fff4ea;
+  --wheel-rim: #151517;
+  --wheel-hub: #1c1c1e;
+  --wheel-hub-line: #3a3a3c;
+  --wheel-peg: #d9d2c3;
+  --wheel-pointer: #f4f1ea;
+  --wheel-pointer-dot: #1c1c1e;
+  --bowl: #18323b;
+  --bowl-rim: #22424d;
+  --slip-a: #f4f1ea;
+  --slip-b: #64d2ff;
+  --ticket: #f4f1ea;
+  --ticket-ink: #1c1c1e;
+  --ticket-line: rgba(28, 28, 30, 0.2);
+  --ticket-n: #1c1c1e;
+  --ticket-n-ink: #64d2ff;
+}
+
+/* ───────── Açık ───────── */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --surface-2: #ececf0;
+  --surface-3: #dcdce2;
+  --stage: #e9e9ee;
+  --hairline: rgba(0, 0, 0, 0.09);
+  --hairline-strong: rgba(0, 0, 0, 0.17);
+
+  --ink: #1d1d1f;
+  --ink-2: rgba(29, 29, 31, 0.68);
+  --ink-3: rgba(29, 29, 31, 0.46);
+  --ink-on-accent: #ffffff;
+
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-press: #0062c4;
+  --accent-soft: rgba(0, 113, 227, 0.12);
+  --focus: #0066cc;
+
+  --danger: #e5352b;
+  --danger-soft: rgba(229, 53, 43, 0.12);
+  --danger-ink: #c4261d;
+  --warn: #a15c00;
+  --ok: #1f9d4a;
+
+  --nav-bg: rgba(245, 245, 247, 0.82);
+  --hover: rgba(0, 0, 0, 0.045);
+  --chip: rgba(0, 0, 0, 0.07);
+  --scrim: rgba(0, 0, 0, 0.35);
+
+  --notice-info-bg: rgba(0, 113, 227, 0.1);
+  --notice-info-ink: #0059b3;
+  --notice-warn-bg: rgba(255, 159, 10, 0.16);
+  --notice-warn-ink: #7a4a00;
+  --notice-error-bg: rgba(255, 59, 48, 0.1);
+  --notice-error-ink: #b3261e;
+
+  --shadow-object: 0 18px 36px -14px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.16);
+  /* Çark, kase ve bilet paleti */
+  --wheel-1: #d97757;
+  --wheel-1t: #ffffff;
+  --wheel-2: #3d3929;
+  --wheel-2t: #faf9f5;
+  --wheel-3: #f0eee6;
+  --wheel-3t: #2b2a28;
+  --wheel-4: #b5553a;
+  --wheel-4t: #ffffff;
+  --wheel-rim: #2b2a28;
+  --wheel-hub: #2b2a28;
+  --wheel-hub-line: #4a4945;
+  --wheel-peg: #f0eee6;
+  --wheel-pointer: #2b2a28;
+  --wheel-pointer-dot: #faf9f5;
+  --bowl: #c6613f;
+  --bowl-rim: #d97757;
+  --slip-a: #ffffff;
+  --slip-b: #f1d4bd;
+  --ticket: #ffffff;
+  --ticket-ink: #1d1d1f;
+  --ticket-line: rgba(29, 29, 31, 0.18);
+  --ticket-n: #c6613f;
+  --ticket-n-ink: #ffffff;
+}
+
+/* ───────── Özel: Claude'un sıcak koyu paleti ───────── */
+:root[data-theme='special'] {
+  color-scheme: dark;
+
+  --bg: #262624;
+  --surface: #30302e;
+  --surface-2: #3b3b38;
+  --surface-3: #4a4a46;
+  --stage: #1f1e1d;
+  --hairline: rgba(250, 249, 245, 0.09);
+  --hairline-strong: rgba(250, 249, 245, 0.17);
+
+  --ink: #faf9f5;
+  --ink-2: rgba(250, 249, 245, 0.68);
+  --ink-3: rgba(250, 249, 245, 0.45);
+  --ink-on-accent: #ffffff;
+
+  --accent: #c6613f;
+  --accent-hover: #d97757;
+  --accent-press: #b3532f;
+  --accent-soft: rgba(217, 119, 87, 0.2);
+  --focus: #e8a083;
+
+  --danger: #e5604f;
+  --danger-soft: rgba(229, 96, 79, 0.18);
+  --danger-ink: #f0988c;
+  --warn: #e8c26a;
+  --ok: #8fc27a;
+
+  --nav-bg: rgba(38, 38, 36, 0.86);
+  --hover: rgba(250, 249, 245, 0.05);
+  --chip: rgba(250, 249, 245, 0.12);
+  --scrim: rgba(0, 0, 0, 0.55);
+
+  --notice-info-bg: rgba(217, 119, 87, 0.16);
+  --notice-info-ink: #f0b8a2;
+  --notice-warn-bg: rgba(232, 194, 106, 0.13);
+  --notice-warn-ink: #efd69a;
+  --notice-error-bg: rgba(229, 96, 79, 0.16);
+  --notice-error-ink: #f0a79c;
+
+  --shadow-object: 0 18px 40px -12px rgba(0, 0, 0, 0.6), 0 4px 10px rgba(0, 0, 0, 0.35);
+  /* Çark, kase ve bilet paleti */
+  --wheel-1: #d97757;
+  --wheel-1t: #ffffff;
+  --wheel-2: #3b3a36;
+  --wheel-2t: #faf9f5;
+  --wheel-3: #ece6d6;
+  --wheel-3t: #2b2a28;
+  --wheel-4: #a8482e;
+  --wheel-4t: #ffffff;
+  --wheel-rim: #1f1e1d;
+  --wheel-hub: #1f1e1d;
+  --wheel-hub-line: #54524d;
+  --wheel-peg: #ece6d6;
+  --wheel-pointer: #faf9f5;
+  --wheel-pointer-dot: #262624;
+  --bowl: #5a4636;
+  --bowl-rim: #6c5543;
+  --slip-a: #faf9f5;
+  --slip-b: #e8a083;
+  --ticket: #faf9f5;
+  --ticket-ink: #262624;
+  --ticket-line: rgba(38, 38, 36, 0.2);
+  --ticket-n: #c6613f;
+  --ticket-n-ink: #ffffff;
+}
+
+/* Açık temada durum çubuğu yazısı beyaz kalır (iOS "black-translucent"); üstte ince koyu şerit okunurluğu korur. */
+:root[data-theme='light'] body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--safe-top);
+  background: #000;
+  z-index: 300;
 }

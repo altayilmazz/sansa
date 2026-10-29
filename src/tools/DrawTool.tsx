@@ -2,24 +2,28 @@ import { motion } from 'motion/react'
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { makeEntries, type Entry } from '../lib/entries'
 import { uid } from '../lib/random'
-import { checkDraw, drawWinners, type RepeatMode } from '../lib/rules/draw'
+import { checkDraw, drawWinners } from '../lib/rules/draw'
 import { isEntryList } from '../lib/storage'
 import { haptic, sfx } from '../features/sound'
 import { useBusy, useMounted, useReducedMotion, wait } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
-import { Button, Group, Notice, Row, Segmented, Stepper } from '../ui/controls'
+import { Button, Group, Notice, Row, Stepper } from '../ui/controls'
+import { EntryChips } from '../ui/EntryChips'
 import { useEntryEditor } from '../ui/EntryEditor'
 import { useExample } from '../ui/ExampleBanner'
+import { Icon } from '../ui/Icon'
+import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
 const isNum = (v: unknown): v is number => typeof v === 'number'
-const isMode = (v: unknown): v is RepeatMode => v === 'tekrarli' || v === 'tekrarsiz'
+const isBool = (v: unknown): v is boolean => typeof v === 'boolean'
 const isIds = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string')
 
 export function DrawTool() {
   const [entries, setEntries] = usePersistent<Entry[]>('kura:list', [], isEntryList)
   const [count, setCount] = usePersistent('kura:count', 1, isNum)
-  const [mode, setMode] = usePersistent<RepeatMode>('kura:mode2', 'tekrarsiz', isMode)
+  // Çekilen kayıt sonraki turlardan çıkar (varsayılan açık). Anahtar yenilendi: eski kayıtlı seçim ezmesin.
+  const [removeDrawn, setRemoveDrawn] = usePersistent('kura:remove2', true, isBool)
   const [drawnIds, setDrawnIds] = usePersistent<string[]>('kura:drawn', [], isIds)
   const [winners, setWinners] = useState<Entry[] | null>(null)
   const [phase, setPhase] = useState<'idle' | 'mix' | 'reveal' | 'done'>('idle')
@@ -49,13 +53,17 @@ export function DrawTool() {
   }, [entries, drawnIds, setDrawnIds])
 
   const pool = useMemo(() => {
-    if (mode === 'tekrarli') return entries
+    if (!removeDrawn) return entries
     const out = new Set(drawnIds)
     return entries.filter((e) => !out.has(e.id))
-  }, [entries, drawnIds, mode])
+  }, [entries, drawnIds, removeDrawn])
 
+  const struck = useMemo(() => new Set(removeDrawn ? drawnIds : []), [removeDrawn, drawnIds])
   const check = checkDraw(pool.length, count)
   const maxCount = Math.max(1, pool.length)
+  const exhausted = removeDrawn && entries.length > 0 && pool.length === 0
+
+  const editor = useEntryEditor({ entries, onChange: setEntries, noun: 'kayıt', placeholder: 'Selin, Mert, Ece', disabled: busy })
 
   const draw = () =>
     run(async () => {
@@ -81,14 +89,14 @@ export function DrawTool() {
       if (!mounted.current) return
       setPhase('done')
       setRound((r) => r + 1)
-      if (mode === 'tekrarsiz') setDrawnIds((d) => [...d, ...result.map((r) => r.id)])
+      if (removeDrawn) setDrawnIds((d) => [...d, ...result.map((r) => r.id)])
       sfx.win()
       const names = result.map((r) => r.name)
       setLive(result.length === 1 ? `Kura sonucu: ${names[0]}.` : `Kura sonucu, çekiliş sırasıyla: ${names.map((n, i) => `${i + 1}. ${n}`).join(', ')}.`)
       record(key, {
         tool: 'kura',
         title: result.length === 1 ? names[0] : `${result.length} kazanan`,
-        detail: `${names.map((n, i) => (result.length > 1 ? `${i + 1}. ${n}` : n)).join(', ')} · ${poolSize} kayıt arasından${mode === 'tekrarsiz' ? ', tekrarsız' : ''}`,
+        detail: `${names.map((n, i) => (result.length > 1 ? `${i + 1}. ${n}` : n)).join(', ')} · ${poolSize} kayıt arasından${removeDrawn ? ', çıkarmalı' : ''}`,
       })
     })
 
@@ -99,83 +107,100 @@ export function DrawTool() {
     setLive('Havuz sıfırlandı; tüm kayıtlar yeniden çekilebilir.')
   }
 
-  const stage = (
-    <div className="draw-stage">
-      {entries.length === 0 ? (
-        <div className="stage-empty">
-          <div className="stage-empty__art stage-empty__art--tickets" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-          <p>Listeye kişi ya da seçenek ekle. Kaç kazanan çekileceğini sen belirle.</p>
-        </div>
-      ) : phase === 'reveal' || phase === 'done' ? (
-        <ol className="tickets" aria-label="Kura sonucu">
-          {winners?.map((w, i) => (
-            <motion.li
-              key={w.id + round}
-              className="ticket"
-              initial={reduced ? { opacity: 0 } : { opacity: 0, rotateX: -95, y: -40, scale: 0.9 }}
-              animate={{ opacity: 1, rotateX: 0, y: 0, scale: 1 }}
-              transition={
-                reduced
-                  ? { duration: 0.15, delay: i * 0.04 }
-                  : { type: 'spring', bounce: 0.3, duration: 0.7, delay: i * Math.max(0.16, 0.42 - winners.length * 0.025) }
-              }
-            >
-              {winners.length > 1 && <span className="ticket__n">{i + 1}</span>}
-              <span className="ticket__name">{w.name}</span>
-            </motion.li>
-          ))}
-        </ol>
-      ) : (
-        <div className={`bowl${phase === 'mix' ? ' is-mixing' : ''}`} aria-hidden="true">
-          {pool.slice(0, 14).map((e, i) => (
-            <span key={e.id} className="bowl__slip" style={{ '--i': i, '--n': Math.min(pool.length, 14) } as CSSProperties} />
-          ))}
-          <span className="bowl__caption">{pool.length} kayıt havuzda</span>
-        </div>
-      )}
-    </div>
+  const undo = (
+    <li className="chips__item">
+      <button type="button" className="sbtn sbtn--sm" aria-label="Son eklenen kaydı çıkar" title="Son eklenen kaydı çıkar" disabled={busy} onClick={editor.undoLast}>
+        <Icon name="undo" size={16} />
+      </button>
+    </li>
   )
 
-  const editor = useEntryEditor({ entries: entries, onChange: setEntries, noun: 'kayıt', placeholder: 'Selin, Mert, Ece', disabled: busy })
-
-  const controls = (
+  const stage = (
     <>
-      <Group title="Liste" id="kura-liste">
-        {editor.body}
-      </Group>
-      <Group title="Çekiliş" id="kura-ayar">
-        <Row label="Kazanan sayısı">
-          <Stepper value={Math.min(count, maxCount)} min={1} max={maxCount} onChange={setCount} label="Kazanan sayısı" disabled={busy || pool.length === 0} />
-        </Row>
-        <Row label="Sonraki turlar">
-          <Segmented<RepeatMode>
-            label="Sonraki turlar"
-            value={mode}
-            onChange={setMode}
-            disabled={busy}
-            options={[
-              { value: 'tekrarsiz', label: 'Tekrarsız' },
-              { value: 'tekrarli', label: 'Tekrarlı' },
-            ]}
-          />
-        </Row>
-        {mode === 'tekrarsiz' && entries.length > 0 && (
-          <Row label="Havuz" hint={`${pool.length} / ${entries.length} kayıt çekilebilir`}>
-            <Button variant="plain" icon="refresh" onClick={resetPool} disabled={busy || drawnIds.length === 0}>
-              Sıfırla
-            </Button>
-          </Row>
+      <div className="stage-body draw-stage">
+        <div className="draw-main">
+          {entries.length === 0 ? (
+            <div className="stage-empty">
+              <div className="stage-empty__art stage-empty__art--tickets" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <p>Alttaki kutuya kişi ya da seçenek yaz. Kaç kazanan çekileceğini aşağı kaydırınca ayarlarsın.</p>
+            </div>
+          ) : phase === 'reveal' || phase === 'done' ? (
+            <ol className="tickets" aria-label="Kura sonucu">
+              {winners?.map((w, i) => (
+                <motion.li
+                  key={w.id + round}
+                  className="ticket"
+                  initial={reduced ? { opacity: 0 } : { opacity: 0, rotateX: -95, y: -40, scale: 0.9 }}
+                  animate={{ opacity: 1, rotateX: 0, y: 0, scale: 1 }}
+                  transition={
+                    reduced
+                      ? { duration: 0.15, delay: i * 0.04 }
+                      : { type: 'spring', bounce: 0.3, duration: 0.7, delay: i * Math.max(0.16, 0.42 - winners.length * 0.025) }
+                  }
+                >
+                  {winners.length > 1 && <span className="ticket__n">{i + 1}</span>}
+                  <span className="ticket__name">{w.name}</span>
+                </motion.li>
+              ))}
+            </ol>
+          ) : (
+            <div className={`bowl${phase === 'mix' ? ' is-mixing' : ''}`} aria-hidden="true">
+              {pool.slice(0, 14).map((e, i) => (
+                <span key={e.id} className="bowl__slip" style={{ '--i': i, '--n': Math.min(pool.length, 14) } as CSSProperties} />
+              ))}
+              <span className="bowl__caption">{pool.length} kayıt havuzda</span>
+            </div>
+          )}
+        </div>
+        {entries.length > 0 && (
+          <div className="draw-side">
+            <EntryChips
+              variant="list"
+              entries={entries}
+              struck={struck}
+              disabled={busy}
+              lead={undo}
+              onRename={editor.rename}
+              onRemove={editor.remove}
+            />
+          </div>
         )}
-      </Group>
+      </div>
       {entries.length > 0 && !check.ok && <Notice tone="error">{pool.length === 0 ? 'Havuzda çekilecek kayıt kalmadı. Havuzu sıfırla ya da yeni kayıt ekle.' : check.error}</Notice>}
+      <StageBar
+        right={
+          <RoundButton
+            icon="strike"
+            label={removeDrawn ? 'Çekileni sonraki turlardan çıkar: açık' : 'Çekileni sonraki turlardan çıkar: kapalı'}
+            on={removeDrawn}
+            disabled={busy}
+            onClick={() => setRemoveDrawn(!removeDrawn)}
+          />
+        }
+      />
     </>
   )
 
-  const exhausted = mode === 'tekrarsiz' && entries.length > 0 && pool.length === 0
+  // Ayarlar yalnızca aşağı kaydırınca görünür.
+  const controls = (
+    <Group title="Çekiliş" id="kura-ayar">
+      <Row label="Kazanan sayısı">
+        <Stepper value={Math.min(count, maxCount)} min={1} max={maxCount} onChange={setCount} label="Kazanan sayısı" disabled={busy || pool.length === 0} />
+      </Row>
+      {removeDrawn && entries.length > 0 && (
+        <Row label="Çekilenleri geri koy" hint={`${pool.length} / ${entries.length} kayıt çekilebilir`}>
+          <Button variant="plain" icon="refresh" onClick={resetPool} disabled={busy || drawnIds.length === 0}>
+            Sıfırla
+          </Button>
+        </Row>
+      )}
+    </Group>
+  )
+
   const action = exhausted ? (
     <Button variant="primary" size="lg" block icon="refresh" onClick={resetPool} disabled={busy}>
       Havuzu sıfırla
@@ -189,19 +214,21 @@ export function DrawTool() {
   return (
     <ToolScaffold
       tool="kura"
-      topBar={editor.adder}
       stage={stage}
       controls={controls}
       action={action}
+      adder={editor.adder}
+      extra={editor.listActions}
+      overlays={editor.sheets}
       live={live}
       banner={banner}
       rules={[
         'Havuzdaki her kaydın seçilme olasılığı eşittir.',
         'Bir çekilişte aynı kayıt birden fazla kez seçilmez.',
-        'Kazanan sayısı havuzdaki kayıt sayısını geçemez.',
-        'Tekrarsızda çıkan kayıtlar sonraki turlarda yeniden çıkmaz; tekrarlıda her turda listenin tamamı çekilişe girer.',
+        'Kazanan sayısı havuzdaki kayıt sayısını geçemez; sayıyı aşağı kaydırınca ayarlarsın.',
+        'Sağ alttaki çizgili düğme açıkken çekilen kayıt sonraki turlardan çıkar ve listede üstü çizili görünür.',
+        'Bir adı düzenlemek için dokun; silmek için basılı tutup alttaki çöp kutusuna sürükle. Soldaki ok son eklenen adı çıkarır.',
       ]}
     />
   )
 }
-

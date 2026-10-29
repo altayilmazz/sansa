@@ -14,6 +14,15 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <script>
+      // İlk boyamadan önce kayıtlı temayı uygula; sayfa açılırken renk titremesin.
+      try {
+        var p = (JSON.parse(localStorage.getItem("sansa:v1:settings")) || {}).theme;
+        var dark = matchMedia("(prefers-color-scheme: dark)").matches;
+        var t = p === "acik" ? "light" : p === "koyu" ? "dark" : p === "ozel" ? "special" : dark ? "dark" : "light";
+        document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

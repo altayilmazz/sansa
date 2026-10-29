@@ -46,6 +46,24 @@ const paths = {
     </>
   ),
   sparkle: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" />,
+  strike: (
+    <>
+      <path d="M4 12h16" />
+      <path d="M16.5 7.5C16 6 14.4 5 12 5S8 6.2 8 8c0 1.4 1 2.2 2.6 2.8M13.4 13.2c1.7.6 2.6 1.4 2.6 2.8 0 1.8-1.6 3-4 3s-4-1-4.5-2.5" />
+    </>
+  ),
+  card: (
+    <>
+      <rect x="6.5" y="3.5" width="11" height="17" rx="2.4" />
+      <path d="M9.8 8h1.6M12.6 16h1.6" />
+    </>
+  ),
+  duel: (
+    <>
+      <rect x="3.2" y="6.5" width="9.5" height="13" rx="2" transform="rotate(-10 8 13)" />
+      <rect x="11" y="4.5" width="9.5" height="13" rx="2" transform="rotate(10 15.7 11)" />
+    </>
+  ),
   undo: <path d="M9 14L4 9l5-5M4 9h10a6 6 0 010 12h-3" />,
 } as const
 

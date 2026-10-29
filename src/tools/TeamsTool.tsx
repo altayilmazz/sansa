@@ -1,4 +1,4 @@
-import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
+import { LayoutGroup, motion } from 'motion/react'
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { makeEntries, type Entry } from '../lib/entries'
 import { uid } from '../lib/random'
@@ -8,9 +8,11 @@ import { useBusy, useMounted, useReducedMotion, wait } from '../state/hooks'
 import { usePersistent, useStore } from '../state/store'
 import { isEntryList } from '../lib/storage'
 import { copyText } from '../ui/clipboard'
-import { Button, Group, Notice, Row, Stepper } from '../ui/controls'
+import { Button, Notice, Stepper } from '../ui/controls'
+import { EntryChips } from '../ui/EntryChips'
 import { useEntryEditor } from '../ui/EntryEditor'
 import { useExample } from '../ui/ExampleBanner'
+import { StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
 const TEAM_TINTS = ['#ff6b5e', '#4ea8ff', '#30d158', '#ffd60a', '#ff9f0a', '#bf8cff', '#f4f1ea', '#98989d']
@@ -50,6 +52,8 @@ export function TeamsTool() {
       setCopied(false)
     }
   }, [signature])
+
+  const editor = useEntryEditor({ entries, onChange: setEntries, noun: 'kişi', placeholder: 'Ayşe, Mehmet, Can', disabled: busy })
 
   const deal = () =>
     run(async () => {
@@ -94,90 +98,67 @@ export function TeamsTool() {
   const showTeams = teams && (phase === 'deal' || phase === 'done')
 
   const stage = (
-    <div className="teams-stage">
-      <LayoutGroup>
-        {!showTeams ? (
-          entries.length === 0 ? (
-            <div className="stage-empty">
-              <div className="stage-empty__art" aria-hidden="true">
-                <span />
-                <span />
+    <>
+      <div className="stage-body teams-stage">
+        <LayoutGroup>
+          {!showTeams ? (
+            entries.length === 0 ? (
+              <div className="stage-empty">
+                <div className="stage-empty__art" aria-hidden="true">
+                  <span />
+                  <span />
+                </div>
+                <p>Kişileri alttaki kutuya yaz. Herkes rastgele ve olabildiğince eşit sayıda dağıtılır.</p>
               </div>
-              <p>Kişileri ekle, takım sayısını seç. Herkes rastgele ve olabildiğince eşit sayıda dağıtılır.</p>
-            </div>
+            ) : (
+              <EntryChips
+                entries={entries}
+                onRename={editor.rename}
+                onRemove={editor.remove}
+                disabled={busy}
+                layoutPrefix={reduced ? undefined : 'p-'}
+                className={phase === 'shuffle' ? 'is-shuffling' : ''}
+              />
+            )
           ) : (
-            <div className={`pile${phase === 'shuffle' ? ' is-shuffling' : ''}`} aria-label="Dağıtılacak kişiler">
-              {entries.map((e, i) => (
-                <motion.span
-                  key={e.id}
-                  layoutId={reduced ? undefined : `p-${e.id}`}
-                  className="chip"
-                  style={{ '--i': i } as CSSProperties}
-                  transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
-                >
-                  {e.name}
-                </motion.span>
+            <div className="teams" style={{ '--cols': Math.min(teams.length, 4) } as CSSProperties}>
+              {teams.map((team, ti) => (
+                <section key={ti} className="team" style={{ '--team': TEAM_TINTS[ti] } as CSSProperties} aria-label={`${TEAM_NAMES[ti]}, ${team.length} kişi`}>
+                  <header className="team__head">
+                    <span className="team__dot" aria-hidden="true" />
+                    <h3 className="team__name">{TEAM_NAMES[ti]}</h3>
+                    <span className="team__count">{team.length}</span>
+                  </header>
+                  <ul className="team__list">
+                    {team.map((p, pi) => {
+                      const order = pi * teams.length + ti
+                      return (
+                        <motion.li
+                          key={p.id}
+                          layoutId={reduced ? undefined : `p-${p.id}`}
+                          className="chip chip--team"
+                          initial={reduced ? { opacity: 0 } : false}
+                          animate={{ opacity: 1 }}
+                          transition={reduced ? { duration: 0.15 } : { type: 'spring', bounce: 0.22, duration: 0.6, delay: Math.min(order * 0.075, 1.2) }}
+                        >
+                          {p.name}
+                        </motion.li>
+                      )
+                    })}
+                  </ul>
+                </section>
               ))}
             </div>
-          )
-        ) : (
-          <div className="teams" style={{ '--cols': Math.min(teams.length, 4) } as CSSProperties}>
-            {teams.map((team, ti) => (
-              <section key={ti} className="team" style={{ '--team': TEAM_TINTS[ti] } as CSSProperties} aria-label={`${TEAM_NAMES[ti]}, ${team.length} kişi`}>
-                <header className="team__head">
-                  <span className="team__dot" aria-hidden="true" />
-                  <h3 className="team__name">{TEAM_NAMES[ti]}</h3>
-                  <span className="team__count">{team.length}</span>
-                </header>
-                <ul className="team__list">
-                  {team.map((p, pi) => {
-                    const order = pi * teams.length + ti
-                    return (
-                      <motion.li
-                        key={p.id}
-                        layoutId={reduced ? undefined : `p-${p.id}`}
-                        className="chip chip--team"
-                        initial={reduced ? { opacity: 0 } : false}
-                        animate={{ opacity: 1 }}
-                        transition={reduced ? { duration: 0.15 } : { type: 'spring', bounce: 0.22, duration: 0.6, delay: Math.min(order * 0.075, 1.2) }}
-                      >
-                        {p.name}
-                      </motion.li>
-                    )
-                  })}
-                </ul>
-              </section>
-            ))}
-          </div>
-        )}
-      </LayoutGroup>
-    </div>
-  )
+          )}
+        </LayoutGroup>
+      </div>
 
-  const editor = useEntryEditor({ entries: entries, onChange: setEntries, noun: 'kişi', placeholder: 'Ayşe, Mehmet, Can', disabled: busy })
+      {entries.length > 0 && !plan.ok && <Notice tone="error">{plan.error}</Notice>}
+      {plan.ok && !plan.even && <Notice tone="warn">{plan.note}</Notice>}
 
-  const controls = (
-    <>
-      <Group title="Kişiler" id="takim-kisiler">
-        {editor.body}
-      </Group>
-      <Group title="Takımlar" id="takim-ayar">
-        <Row label="Takım sayısı" hint={plan.ok ? (plan.even ? `Her takımda ${plan.sizes[0]} kişi` : undefined) : undefined}>
-          <Stepper value={count} min={MIN_TEAMS} max={MAX_TEAMS} onChange={setCount} label="Takım sayısı" disabled={busy} />
-        </Row>
-      </Group>
-      <AnimatePresence initial={false}>
-        {entries.length > 0 && !plan.ok && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-            <Notice tone="error">{plan.error}</Notice>
-          </motion.div>
-        )}
-        {plan.ok && !plan.even && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-            <Notice tone="warn">{plan.note}</Notice>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <StageBar
+        center={<Stepper value={count} min={MIN_TEAMS} max={MAX_TEAMS} onChange={setCount} label="Takım sayısı" disabled={busy} format={(n) => `${n} takım`} />}
+      />
     </>
   )
 
@@ -200,16 +181,18 @@ export function TeamsTool() {
   return (
     <ToolScaffold
       tool="takim"
-      topBar={editor.adder}
       stage={stage}
-      controls={controls}
       action={action}
+      adder={editor.adder}
+      extra={editor.listActions}
+      overlays={editor.sheets}
       live={live}
       banner={banner}
       rules={[
         'Herkes tam olarak bir takımda yer alır.',
         'Kişi sayıları en fazla bir farkla eşitlenir; tam eşit olmuyorsa önceden belirtilir.',
         'Dağıtım tamamen rastgeledir; yetenek ya da güç dengesi gözetilmez.',
+        'Takım sayısını sahnedeki − ve + ile seç. Bir adı düzenlemek için dokun; silmek için basılı tutup alttaki çöp kutusuna sürükle.',
       ]}
     />
   )

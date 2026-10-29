@@ -1,8 +1,6 @@
-import { AnimatePresence, motion } from 'motion/react'
-import { useId, useMemo, useRef, useState, type ReactNode } from 'react'
-import { addNames, duplicateKeys, normalize, type Entry } from '../lib/entries'
+import { useId, useRef, useState, type ReactNode } from 'react'
+import { addNames, type Entry } from '../lib/entries'
 import { useStore } from '../state/store'
-import { useReducedMotion } from '../state/hooks'
 import { Button, IconButton, Notice } from './controls'
 import { Icon } from './Icon'
 import { Sheet } from './Sheet'
@@ -15,31 +13,31 @@ interface Options {
   placeholder: string
   disabled?: boolean
   max?: number
-  /** Kayıtlı listelerden yükleme ve listeyi kaydetme. */
-  lists?: boolean
 }
 
-interface EntryEditor {
-  /** Tek satırlık ekleme çubuğu: aracın en üstüne yerleştirilir. */
+export interface EntryEditor {
+  /** Alt çubukta, ana düğmenin üstünde duran tek satırlık ekleme çubuğu. */
   adder: ReactNode
-  /** Sayaç, liste araçları ve kayıtların listesi: kontroller bölümüne yerleştirilir. */
-  body: ReactNode
+  /** Bilgi penceresindeki liste işlemleri: Listeler, Kaydet, Temizle. */
+  listActions: (close: () => void) => ReactNode
+  /** Kayıtlı listeler penceresi; aracın içinde bir yerde bir kez çizilmelidir. */
+  sheets: ReactNode
+  rename: (id: string, name: string) => void
+  remove: (id: string) => void
+  /** Son eklenen kaydı çıkarır (yanlış ekleneni düzeltmek için). */
+  undoLast: () => void
 }
 
 /**
- * Kişi/seçenek listesinin düzenleyicisi. Ekleme çubuğu ile liste aynı durumu
- * paylaşır ama farklı yerlerde durabilsin diye iki parça olarak döner.
+ * Kişi/seçenek listesinin mantığı. Liste ekranda sahnede çizilir; bu kanca
+ * yalnızca ekleme çubuğunu, işlemleri ve kayıtlı listeler penceresini verir.
  */
-export function useEntryEditor({ entries, onChange, noun, placeholder, disabled, max = 60, lists = true }: Options): EntryEditor {
+export function useEntryEditor({ entries, onChange, noun, placeholder, disabled, max = 60 }: Options): EntryEditor {
   const id = useId()
   const [draft, setDraft] = useState('')
   const [message, setMessage] = useState<{ tone: 'info' | 'warn' | 'error'; text: string } | null>(null)
-  const [editing, setEditing] = useState<string | null>(null)
-  const [editText, setEditText] = useState('')
   const [sheet, setSheet] = useState<null | 'save' | 'load'>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const reduced = useReducedMotion()
-  const dups = useMemo(() => duplicateKeys(entries), [entries])
 
   const addText = (text: string) => {
     const res = addNames(entries, text)
@@ -57,7 +55,7 @@ export function useEntryEditor({ entries, onChange, noun, placeholder, disabled,
       const names = [...new Set(res.duplicates)].map((n) => `“${n}”`).join(', ')
       setMessage({
         tone: 'warn',
-        text: `${names} listede birden fazla kez var. Hepsi ayrı kayıt olarak tutuldu; farklı kişilerse düzenleyerek ayırt edebilirsin (ör. “Ali K.”).`,
+        text: `${names} listede birden fazla kez var. Ayrı kayıt olarak tutuldu; farklı kişilerse dokunup düzenleyerek ayırt edebilirsin (ör. “Ali K.”).`,
       })
     } else {
       setMessage({ tone: 'info', text: `${res.added} ${noun} eklendi.` })
@@ -65,20 +63,24 @@ export function useEntryEditor({ entries, onChange, noun, placeholder, disabled,
     inputRef.current?.focus()
   }
 
-  const commitEdit = (e: Entry) => {
-    const clean = editText.replace(/\s+/g, ' ').trim()
-    if (!clean) {
-      setMessage({ tone: 'error', text: 'İsim boş bırakılamaz. Silmek istiyorsan çöp kutusu düğmesini kullan.' })
-      return
-    }
-    onChange(entries.map((x) => (x.id === e.id ? { ...x, name: clean } : x)))
-    setEditing(null)
+  const rename = (rid: string, name: string) => {
+    const clean = name.replace(/\s+/g, ' ').trim()
+    if (!clean) return
+    onChange(entries.map((x) => (x.id === rid ? { ...x, name: clean } : x)))
     setMessage(null)
   }
 
-  const remove = (e: Entry) => {
-    onChange(entries.filter((x) => x.id !== e.id))
-    setMessage({ tone: 'info', text: `“${e.name}” silindi.` })
+  const remove = (rid: string) => {
+    const gone = entries.find((x) => x.id === rid)
+    onChange(entries.filter((x) => x.id !== rid))
+    if (gone) setMessage({ tone: 'info', text: `“${gone.name}” silindi.` })
+  }
+
+  const undoLast = () => {
+    const last = entries[entries.length - 1]
+    if (!last) return
+    onChange(entries.slice(0, -1))
+    setMessage({ tone: 'info', text: `“${last.name}” çıkarıldı.` })
   }
 
   const label = noun[0].toLocaleUpperCase('tr-TR') + noun.slice(1) + ' ekle'
@@ -124,7 +126,7 @@ export function useEntryEditor({ entries, onChange, noun, placeholder, disabled,
       <div id={`${id}-msg`} aria-live="polite">
         {message &&
           (message.tone === 'info' ? (
-            // Başarı bildirimi yalnızca ekran okuyucuya; görünür geri bildirim listenin kendisi.
+            // Başarı bildirimi yalnızca ekran okuyucuya; görünür geri bildirim sahnedeki liste.
             <span className="sr-only">{message.text}</span>
           ) : (
             <Notice tone={message.tone}>{message.text}</Notice>
@@ -133,120 +135,69 @@ export function useEntryEditor({ entries, onChange, noun, placeholder, disabled,
     </div>
   )
 
-  const body = (
-    <div className="editor">
-      <div className="editor__bar">
-        <span className="editor__count">
-          {entries.length} {noun}
-        </span>
-        <div className="editor__tools">
-          {lists && (
-            <>
-              <Button variant="plain" icon="list" onClick={() => setSheet('load')} disabled={disabled}>
-                Listeler
-              </Button>
-              <Button variant="plain" icon="bookmark" onClick={() => setSheet('save')} disabled={disabled || entries.length === 0}>
-                Kaydet
-              </Button>
-            </>
-          )}
-          {entries.length > 0 && (
-            <Button
-              variant="plain"
-              icon="trash"
-              disabled={disabled}
-              onClick={() => {
-                onChange([])
-                setMessage({ tone: 'info', text: 'Liste temizlendi.' })
-              }}
-            >
-              Temizle
-            </Button>
-          )}
-        </div>
+  const listActions = (close: () => void) => (
+    <section className="info" aria-labelledby={`${id}-list`}>
+      <h3 className="info__title" id={`${id}-list`}>
+        Liste
+      </h3>
+      <div className="info__actions">
+        <Button
+          variant="secondary"
+          icon="list"
+          disabled={disabled}
+          onClick={() => {
+            close()
+            setSheet('load')
+          }}
+        >
+          Kayıtlı listeler
+        </Button>
+        <Button
+          variant="secondary"
+          icon="bookmark"
+          disabled={disabled || entries.length === 0}
+          onClick={() => {
+            close()
+            setSheet('save')
+          }}
+        >
+          Listeyi kaydet
+        </Button>
+        <Button
+          variant="secondary"
+          icon="trash"
+          disabled={disabled || entries.length === 0}
+          onClick={() => {
+            onChange([])
+            setMessage({ tone: 'info', text: 'Liste temizlendi.' })
+            close()
+          }}
+        >
+          Listeyi temizle
+        </Button>
       </div>
-
-      {entries.length > 0 && (
-        <ul className="editor__list" aria-label={`${noun} listesi`}>
-          <AnimatePresence initial={false}>
-            {entries.map((e, i) => {
-              const dup = dups.has(normalize(e.name))
-              return (
-                <motion.li
-                  key={e.id}
-                  className="editor__item"
-                  layout={!reduced}
-                  initial={reduced ? false : { opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reduced ? { opacity: 0 } : { opacity: 0, x: -24, transition: { duration: 0.18 } }}
-                  transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }}
-                >
-                  <span className="editor__index" aria-hidden="true">
-                    {i + 1}
-                  </span>
-                  {editing === e.id ? (
-                    <form
-                      className="editor__edit"
-                      onSubmit={(ev) => {
-                        ev.preventDefault()
-                        commitEdit(e)
-                      }}
-                    >
-                      <input
-                        className="field field--inline"
-                        aria-label={`“${e.name}” için yeni isim`}
-                        value={editText}
-                        autoFocus
-                        onChange={(ev) => setEditText(ev.target.value)}
-                        onKeyDown={(ev) => ev.key === 'Escape' && setEditing(null)}
-                      />
-                      <IconButton icon="check" label="Kaydet" type="submit" />
-                      <IconButton icon="close" label="Vazgeç" onClick={() => setEditing(null)} />
-                    </form>
-                  ) : (
-                    <>
-                      <span className="editor__name">{e.name}</span>
-                      {dup && <span className="badge badge--warn">Aynı isim</span>}
-                      <IconButton
-                        icon="pencil"
-                        label={`“${e.name}” düzenle`}
-                        disabled={disabled}
-                        onClick={() => {
-                          setEditing(e.id)
-                          setEditText(e.name)
-                        }}
-                      />
-                      <IconButton icon="trash" label={`“${e.name}” sil`} disabled={disabled} onClick={() => remove(e)} />
-                    </>
-                  )}
-                </motion.li>
-              )
-            })}
-          </AnimatePresence>
-        </ul>
-      )}
-
-      {lists && (
-        <ListsSheet
-          mode={sheet}
-          onClose={() => setSheet(null)}
-          entries={entries}
-          onLoad={(list) => {
-            onChange(list.map((x) => ({ ...x })))
-            setMessage({ tone: 'info', text: `Kayıtlı liste yüklendi (${list.length} ${noun}).` })
-            setSheet(null)
-          }}
-          onSaved={(name) => {
-            setMessage({ tone: 'info', text: `Liste “${name}” adıyla kaydedildi.` })
-            setSheet(null)
-          }}
-          noun={noun}
-        />
-      )}
-    </div>
+    </section>
   )
 
-  return { adder, body }
+  const sheets = (
+    <ListsSheet
+      mode={sheet}
+      onClose={() => setSheet(null)}
+      entries={entries}
+      onLoad={(list) => {
+        onChange(list.map((x) => ({ ...x })))
+        setMessage({ tone: 'info', text: `Kayıtlı liste yüklendi (${list.length} ${noun}).` })
+        setSheet(null)
+      }}
+      onSaved={(name) => {
+        setMessage({ tone: 'info', text: `Liste “${name}” adıyla kaydedildi.` })
+        setSheet(null)
+      }}
+      noun={noun}
+    />
+  )
+
+  return { adder, listActions, sheets, rename, remove, undoLast }
 }
 
 function ListsSheet({

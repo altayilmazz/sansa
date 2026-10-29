@@ -232,8 +232,8 @@ h1:focus {
   padding: 0 10px;
 }
 .btn--danger {
-  background: rgba(255, 69, 58, 0.16);
-  color: #ff8a82;
+  background: var(--danger-soft);
+  color: var(--danger-ink);
 }
 .btn:disabled {
   opacity: 0.38;
@@ -251,7 +251,7 @@ h1:focus {
     background: var(--accent-soft);
   }
   .btn--primary:not(:disabled):hover {
-    background: #2491ff;
+    background: var(--accent-hover);
   }
 }
 
@@ -438,20 +438,20 @@ h1:focus {
   border-radius: 12px;
   font-size: var(--fs-sub);
   line-height: 1.4;
-  background: rgba(10, 132, 255, 0.12);
-  color: #a9d1ff;
+  background: var(--notice-info-bg);
+  color: var(--notice-info-ink);
 }
 .notice svg {
   flex: none;
   margin-top: 2px;
 }
 .notice--warn {
-  background: rgba(255, 214, 10, 0.1);
-  color: #ffe38a;
+  background: var(--notice-warn-bg);
+  color: var(--notice-warn-ink);
 }
 .notice--error {
-  background: rgba(255, 69, 58, 0.13);
-  color: #ffaaa4;
+  background: var(--notice-error-bg);
+  color: var(--notice-error-ink);
 }
 
 .field {
@@ -484,7 +484,7 @@ textarea.field {
   resize: vertical;
 }
 .field-error {
-  color: #ff9b94;
+  color: var(--danger-ink);
   font-size: var(--fs-foot);
 }
 .badge {
@@ -495,8 +495,8 @@ textarea.field {
   border-radius: 999px;
 }
 .badge--warn {
-  background: rgba(255, 214, 10, 0.14);
-  color: #ffd60a;
+  background: var(--notice-warn-bg);
+  color: var(--warn);
 }
 
 .stack {
@@ -593,7 +593,7 @@ textarea.field {
   color: var(--ink);
 }
 .sheet::backdrop {
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--scrim);
 }
 .sheet[open] {
   animation: sheet-in 0.32s var(--ease-ios);
@@ -724,7 +724,7 @@ textarea.field {
   gap: 10px;
   padding: 12px 8px 12px 16px;
   border-radius: var(--r-lg);
-  border: 1px dashed rgba(244, 241, 234, 0.25);
+  border: 1px dashed var(--hairline-strong);
   font-size: var(--fs-foot);
   color: var(--ink-2);
 }
@@ -847,7 +847,7 @@ textarea.field {
   max-width: 100%;
   overflow-wrap: anywhere;
 }
-.pile.is-shuffling .chip {
+.chips.is-shuffling .chip {
   animation: jiggle 0.5s ease-in-out;
   animation-delay: calc(var(--i) * -37ms);
 }
@@ -925,7 +925,7 @@ textarea.field {
 }
 .wheel-wrap {
   position: relative;
-  width: min(100%, 340px);
+  width: min(100%, 340px, max(220px, calc(100dvh - 400px)));
 }
 .wheel-wrap.is-empty .wheel__disc {
   opacity: 0.25;
@@ -1023,8 +1023,8 @@ textarea.field {
   width: 200px;
   height: 92px;
   border-radius: 0 0 100px 100px;
-  background: #18323b;
-  box-shadow: inset 0 10px 0 #22424d;
+  background: var(--bowl);
+  box-shadow: inset 0 10px 0 var(--bowl-rim);
 }
 .bowl__slip {
   position: absolute;
@@ -1033,12 +1033,12 @@ textarea.field {
   width: 52px;
   height: 30px;
   border-radius: 6px;
-  background: #f4f1ea;
+  background: var(--slip-a);
   transform: rotate(calc((var(--i) * 37deg) - 30deg));
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 .bowl__slip:nth-child(3n) {
-  background: #64d2ff;
+  background: var(--slip-b);
 }
 .bowl.is-mixing .bowl__slip {
   animation: mix 0.32s ease-in-out infinite alternate;
@@ -1069,8 +1069,8 @@ textarea.field {
   gap: 14px;
   padding: 16px 18px;
   border-radius: 14px;
-  background: #f4f1ea;
-  color: #1c1c1e;
+  background: var(--ticket);
+  color: var(--ticket-ink);
   transform-origin: 50% 0;
   box-shadow: var(--shadow-object);
   position: relative;
@@ -1079,7 +1079,7 @@ textarea.field {
   content: '';
   position: absolute;
   inset: 6px;
-  border: 1px dashed rgba(28, 28, 30, 0.2);
+  border: 1px dashed var(--ticket-line);
   border-radius: 9px;
   pointer-events: none;
 }
@@ -1090,8 +1090,8 @@ textarea.field {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #1c1c1e;
-  color: #64d2ff;
+  background: var(--ticket-n);
+  color: var(--ticket-n-ink);
   font-weight: 700;
   font-size: 14px;
 }
@@ -1244,36 +1244,52 @@ textarea.field {
   transform: translateZ(2.2px);
 }
 /* Tura yüzü gümüş-mavi: dönerken iki yüz arasındaki renk değişimi hissedilir. */
+.coin__face--yazi {
+  background: radial-gradient(circle at 34% 28%, var(--y1) 0%, var(--y2) 38%, var(--y3) 78%, var(--y4) 100%);
+  box-shadow: inset 0 0 0 5px var(--yr1), inset 0 0 0 7px var(--yr2);
+}
+.coin__face--yazi .coin__ring {
+  border-color: var(--yink);
+  color: var(--yink);
+}
+/* Tura yüzü: renk ve sembol kullanıcı seçimidir */
 .coin__face--tura {
   transform: rotateX(180deg) translateZ(2.2px);
-  background: radial-gradient(circle at 34% 28%, #f4f8fc 0%, #c6d2de 38%, #8c9db0 78%, #5d6c7d 100%);
-  box-shadow: inset 0 0 0 5px #a9b8c8, inset 0 0 0 7px #66778a;
+  background: radial-gradient(circle at 34% 28%, var(--t1) 0%, var(--t2) 38%, var(--t3) 78%, var(--t4) 100%);
+  box-shadow: inset 0 0 0 5px var(--tr1), inset 0 0 0 7px var(--tr2);
 }
 .coin__ring {
   width: 74%;
   height: 74%;
   border-radius: 50%;
   border: 2px dotted rgba(122, 84, 20, 0.55);
+  position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   color: #7a5414;
-  gap: 2px;
 }
 .coin__face--tura .coin__ring {
-  border-color: rgba(38, 52, 70, 0.55);
-  color: #2d3b4d;
+  border-color: var(--tink);
+  color: var(--tink);
+  --vein: var(--t3);
 }
 .coin__num {
-  font-size: 72px;
+  font-size: calc(var(--coin, 168px) * 0.43);
   font-weight: 800;
-  line-height: 0.9;
+  line-height: 1;
   letter-spacing: -0.04em;
   text-shadow: 0 1px 0 rgba(255, 240, 200, 0.6);
+  /* "1" rakamının mürekkep merkezi satır kutusunun merkezinden bir miktar farklı; ölçülüp düzeltildi */
+  transform: translate(var(--num-dx, 0), var(--num-dy, 0));
 }
 .coin__word {
-  font-size: 14px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9%;
+  text-align: center;
+  font-size: calc(var(--coin, 168px) * 0.083);
   font-weight: 700;
   letter-spacing: 0.06em;
 }
@@ -1451,24 +1467,24 @@ textarea.field {
   transform: rotate(180deg);
 }
 .pcard__rank {
-  font-size: 0.16em;
+  font-size: 0.15em;
   font-weight: 700;
   letter-spacing: -0.04em;
 }
 .pcard__csuit {
-  width: 0.11em;
-  height: 0.11em;
+  width: 0.1em;
+  height: 0.1em;
   margin-top: 0.02em;
 }
 .pcard__center {
   position: absolute;
-  inset: 15% 27%;
+  inset: 15% 33%;
   display: grid;
   place-items: center;
 }
 .pcard__ace {
-  width: 0.46em;
-  height: 0.46em;
+  width: 0.34em;
+  height: 0.34em;
 }
 .pcard__pips {
   position: relative;
@@ -1479,8 +1495,8 @@ textarea.field {
   position: absolute;
   left: calc(var(--c) * 50%);
   top: calc(var(--r) / 6 * 100%);
-  width: 0.14em;
-  height: 0.14em;
+  width: 0.12em;
+  height: 0.12em;
   transform: translate(-50%, -50%);
 }
 .pcard__pip svg {
@@ -1504,7 +1520,7 @@ textarea.field {
   background: color-mix(in srgb, currentColor 7%, transparent);
 }
 .pcard__court-letter {
-  font-size: 0.34em;
+  font-size: 0.28em;
   font-weight: 800;
   line-height: 1;
 }
@@ -1657,6 +1673,106 @@ textarea.field {
   color: var(--ink-3);
   text-align: center;
   max-width: 360px;
+}
+
+/* ───────── Yeni sahne parçaları ───────── */
+/* Çark: dilime dokununca çıkan küçük çöp düğmesi */
+.wheel__body {
+  position: relative;
+}
+.wheel__slice {
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.wheel__slice:focus-visible path:first-child {
+  stroke: var(--focus);
+  stroke-width: 3;
+}
+.wheel__slice.is-sel path:first-child {
+  filter: brightness(1.14);
+}
+.wheel__trash {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--danger);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  animation: pop-in 0.18s var(--ease-out);
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* Kura: sonuç sahnenin ortasında, isim listesi sağ üstte sağa yaslı ve dar */
+.stage-body.draw-stage {
+  position: relative;
+  perspective: 900px;
+}
+.draw-main {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.draw-side {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  max-width: 48%;
+  max-height: 42%;
+  overflow-y: auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+.draw-side .chips {
+  width: auto;
+  max-width: 100%;
+}
+
+/* Çark renkleri (temaya göre) */
+.wheel__rim {
+  fill: var(--wheel-rim);
+}
+.wheel__seg {
+  stroke: var(--wheel-rim);
+  stroke-width: 1.5;
+}
+.wheel__peg,
+.wheel__hub-dot {
+  fill: var(--wheel-peg);
+}
+.wheel__hub {
+  fill: var(--wheel-hub);
+  stroke: var(--wheel-hub-line);
+  stroke-width: 2;
+}
+.wheel__ptr {
+  fill: var(--wheel-pointer);
+}
+.wheel__ptr-dot {
+  fill: var(--wheel-pointer-dot);
+}
+/* Açık temada krem renkli işaretler beyaz zeminde kaybolmasın */
+:root[data-theme='light'] .glyph,
+:root[data-theme='light'] .sitenav svg,
+:root[data-theme='light'] .foot__brand svg {
+  filter: drop-shadow(0 0 0.6px rgba(0, 0, 0, 0.5));
 }
 
 /* ───────── Hareketi azalt ───────── */
