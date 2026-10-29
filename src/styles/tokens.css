@@ -110,6 +110,30 @@
   --ticket-line: rgba(28, 28, 30, 0.2);
   --ticket-n: #1c1c1e;
   --ticket-n-ink: #64d2ff;
+  /* Araç logoları */
+  --g-t1: #1f9d46;
+  --g-t2: #3a9bc7;
+  --g-c0: #151517;
+  --g-c1: #b86f0a;
+  --g-c2: #8f8a7e;
+  --g-c3: #8f3208;
+  --g-ch: #0e0e10;
+  --g-cl: #bdb8ac;
+  --g-k1: #12272f;
+  --g-k2: #3f8aa8;
+  --g-k3: #070f13;
+  --g-k4: #bdb8ac;
+  --g-p1: #6b5016;
+  --g-p2: #a88428;
+  --g-p3: #4a340c;
+  --g-z1: #b8b2a4;
+  --g-z2: #8f897c;
+  --g-z3: #121214;
+  --g-z4: #b5302a;
+  --g-r1: #2b2a80;
+  --g-r2: #c9c5ba;
+  --g-r3: #a8272b;
+  --g-ln: none;
 }
 
 /* ───────── Açık ───────── */
@@ -178,6 +202,30 @@
   --ticket-line: rgba(29, 29, 31, 0.18);
   --ticket-n: #c6613f;
   --ticket-n-ink: #ffffff;
+  /* Araç logoları */
+  --g-t1: #2f6fde;
+  --g-t2: #8e8e93;
+  --g-c0: #1d1d1f;
+  --g-c1: #2563eb;
+  --g-c2: #f5f7fb;
+  --g-c3: #8e8e93;
+  --g-ch: #1d1d1f;
+  --g-cl: #1d1d1f;
+  --g-k1: #3a4a63;
+  --g-k2: #5b8def;
+  --g-k3: #1d2740;
+  --g-k4: #e6ebf5;
+  --g-p1: #8e98a8;
+  --g-p2: #c9d3e3;
+  --g-p3: #4a5568;
+  --g-z1: #eef1f6;
+  --g-z2: #c5ccd8;
+  --g-z3: #1d2433;
+  --g-z4: #2563eb;
+  --g-r1: #1e40af;
+  --g-r2: #f5f7fb;
+  --g-r3: #2563eb;
+  --g-ln: rgba(29,29,31,0.22);
 }
 
 /* ───────── Özel: Claude'un sıcak koyu paleti ───────── */
@@ -246,6 +294,30 @@
   --ticket-line: rgba(38, 38, 36, 0.2);
   --ticket-n: #c6613f;
   --ticket-n-ink: #ffffff;
+  /* Araç logoları */
+  --g-t1: #d97757;
+  --g-t2: #8f8b80;
+  --g-c0: #262624;
+  --g-c1: #d97757;
+  --g-c2: #ece6d6;
+  --g-c3: #a8482e;
+  --g-ch: #1f1e1d;
+  --g-cl: #faf9f5;
+  --g-k1: #4a3a2d;
+  --g-k2: #d97757;
+  --g-k3: #1f1e1d;
+  --g-k4: #faf9f5;
+  --g-p1: #8f4a2f;
+  --g-p2: #d97757;
+  --g-p3: #7a2f18;
+  --g-z1: #ece6d6;
+  --g-z2: #cbbf9f;
+  --g-z3: #262624;
+  --g-z4: #d97757;
+  --g-r1: #c6613f;
+  --g-r2: #faf9f5;
+  --g-r3: #d97757;
+  --g-ln: none;
 }
 
 /* Açık temada durum çubuğu yazısı beyaz kalır (iOS "black-translucent"); üstte ince koyu şerit okunurluğu korur. */

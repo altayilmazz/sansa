@@ -21,10 +21,11 @@
   bottom: 0;
   z-index: 50;
   padding-bottom: var(--safe-bottom);
-  background: var(--nav-bg);
-  -webkit-backdrop-filter: var(--blur-bar);
-  backdrop-filter: var(--blur-bar);
-  border-top: 1px solid var(--hairline);
+  /* Çubuk yok: düğmeler içeriğin üstünde yüzer */
+  pointer-events: none;
+}
+.dock__inner > * {
+  pointer-events: auto;
 }
 .dock__inner {
   display: flex;

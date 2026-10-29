@@ -9,7 +9,6 @@ import { href, parseRoute, useHash, type Route } from './state/router'
 import { useStore } from './state/store'
 import { applyTheme, resolveTheme } from './state/theme'
 import { TOOLS } from './state/tools'
-import { BrandMark } from './ui/Brand'
 import { Icon, type IconName } from './ui/Icon'
 
 const LINKS: { route: Route; label: string; icon: IconName }[] = [
@@ -24,7 +23,7 @@ function Dock({ route }: { route: Route }) {
     <nav className="dock" aria-label="Ana gezinme">
       <div className="dock__inner">
         <a className="dock__btn dock__home" href={href({ name: 'home' })} aria-label="Ana sayfa" title="Ana sayfa">
-          <BrandMark size={26} />
+          <Icon name="home" size={22} />
         </a>
         <div className="dock__links">
           {LINKS.map((l) => {
