@@ -48,6 +48,13 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
+  --tint-takim: #d1d1d6;
+  --tint-cark: #d1d1d6;
+  --tint-kura: #d1d1d6;
+  --tint-para: #d1d1d6;
+  --tint-zar: #d1d1d6;
+  --tint-kart: #d1d1d6;
+
   --bg: #000000;
   --surface: #1d1d1f;
   --surface-2: #2a2a2c;
@@ -59,13 +66,13 @@
   --ink: #f4f1ea;
   --ink-2: rgba(244, 241, 234, 0.64);
   --ink-3: rgba(244, 241, 234, 0.42);
-  --ink-on-accent: #ffffff;
+  --ink-on-accent: #000000;
 
-  --accent: #0071e3;
-  --accent-hover: #2491ff;
-  --accent-press: #0066cc;
-  --accent-soft: rgba(41, 151, 255, 0.16);
-  --focus: #2997ff;
+  --accent: #f2f2f7;
+  --accent-hover: #ffffff;
+  --accent-press: #d1d1d6;
+  --accent-soft: rgba(255, 255, 255, 0.14);
+  --focus: #e5e5ea;
 
   --danger: #ff453a;
   --danger-soft: rgba(255, 69, 58, 0.16);
@@ -78,8 +85,8 @@
   --chip: rgba(210, 210, 215, 0.16);
   --scrim: rgba(0, 0, 0, 0.6);
 
-  --notice-info-bg: rgba(10, 132, 255, 0.12);
-  --notice-info-ink: #a9d1ff;
+  --notice-info-bg: rgba(255, 255, 255, 0.08);
+  --notice-info-ink: #d1d1d6;
   --notice-warn-bg: rgba(255, 214, 10, 0.1);
   --notice-warn-ink: #ffe38a;
   --notice-error-bg: rgba(255, 69, 58, 0.13);
@@ -87,52 +94,52 @@
 
   --shadow-object: 0 18px 40px -12px rgba(0, 0, 0, 0.75), 0 4px 10px rgba(0, 0, 0, 0.45);
   /* Çark, kase ve bilet paleti */
-  --wheel-1: #ff9f0a;
-  --wheel-1t: #1c1205;
+  --wheel-1: #f2f2f7;
+  --wheel-1t: #1c1c1e;
   --wheel-2: #26262a;
   --wheel-2t: #f4f1ea;
-  --wheel-3: #efe9dc;
-  --wheel-3t: #1c1c1e;
-  --wheel-4: #c2410c;
-  --wheel-4t: #fff4ea;
+  --wheel-3: #6e6e73;
+  --wheel-3t: #ffffff;
+  --wheel-4: #48484a;
+  --wheel-4t: #ffffff;
   --wheel-rim: #151517;
   --wheel-hub: #1c1c1e;
   --wheel-hub-line: #3a3a3c;
-  --wheel-peg: #d9d2c3;
-  --wheel-pointer: #f4f1ea;
+  --wheel-peg: #d1d1d6;
+  --wheel-pointer: #f2f2f7;
   --wheel-pointer-dot: #1c1c1e;
-  --bowl: #18323b;
-  --bowl-rim: #22424d;
-  --slip-a: #f4f1ea;
-  --slip-b: #64d2ff;
-  --ticket: #f4f1ea;
+  --bowl: #2a2a2d;
+  --bowl-rim: #3a3a3d;
+  --slip-a: #f2f2f7;
+  --slip-b: #8e8e93;
+  --ticket: #f2f2f7;
   --ticket-ink: #1c1c1e;
   --ticket-line: rgba(28, 28, 30, 0.2);
   --ticket-n: #1c1c1e;
-  --ticket-n-ink: #64d2ff;
+  --ticket-n-ink: #f2f2f7;
   /* Araç logoları */
-  --g-t1: #1f9d46;
-  --g-t2: #3a9bc7;
+  --g-t1: #d1d1d6;
+  --g-t2: #7c7c82;
   --g-c0: #151517;
-  --g-c1: #b86f0a;
-  --g-c2: #8f8a7e;
-  --g-c3: #8f3208;
+  --g-c1: #8e8e93;
+  --g-c2: #d1d1d6;
+  --g-c3: #48484a;
   --g-ch: #0e0e10;
-  --g-cl: #bdb8ac;
-  --g-k1: #12272f;
-  --g-k2: #3f8aa8;
-  --g-k3: #070f13;
-  --g-k4: #bdb8ac;
-  --g-p1: #6b5016;
-  --g-p2: #a88428;
-  --g-p3: #4a340c;
-  --g-z1: #b8b2a4;
-  --g-z2: #8f897c;
+  --g-cl: #d1d1d6;
+  --g-k1: #2a2a2d;
+  --g-k2: #8e8e93;
+  --g-k3: #0a0a0b;
+  --g-k4: #d1d1d6;
+  --g-p1: #48484a;
+  --g-p2: #a1a1a6;
+  --g-p3: #2a2a2d;
+  --g-z1: #d1d1d6;
+  --g-z2: #8e8e93;
   --g-z3: #121214;
-  --g-z4: #b5302a;
-  --g-r1: #2b2a80;
-  --g-r2: #c9c5ba;
-  --g-r3: #a8272b;
+  --g-z4: #48484a;
+  --g-r1: #3a3a3c;
+  --g-r2: #d1d1d6;
+  --g-r3: #48484a;
   --g-ln: none;
 }
 
