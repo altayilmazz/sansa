@@ -1,156 +1,120 @@
-import { useRef, useState, type CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { uid } from '../lib/random'
-import { flagsLeft, LEVELS, newGame, reveal, toggleFlag, type Game, type MineLevel } from '../lib/rules/mines'
+import { clampMines, clampSize, maxMines, MAX_SIZE, MIN_SIZE, newGame, reveal, safeLeft, type Game } from '../lib/rules/mines'
 import { haptic, sfx } from '../features/sound'
 import { usePersistent, useStore } from '../state/store'
-import { Button, Row, Segmented } from '../ui/controls'
+import { Button, Row, Segmented, Stepper } from '../ui/controls'
 import { Icon } from '../ui/Icon'
 import { RoundButton, StageBar } from '../ui/StageButtons'
 import { ToolScaffold } from '../ui/ToolScaffold'
 
-const isLevel = (v: unknown): v is MineLevel['id'] => v === 'kolay' || v === 'orta' || v === 'zor'
-const levelOf = (id: MineLevel['id']) => LEVELS.find((l) => l.id === id) ?? LEVELS[0]
-const LONG_PRESS = 380
+const isNum = (v: unknown): v is number => typeof v === 'number'
+const SIZES = Array.from({ length: MAX_SIZE - MIN_SIZE + 1 }, (_, i) => MIN_SIZE + i)
+
+function MineIcon({ size = 30 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <g fill="currentColor">
+        <circle cx="16" cy="17" r="8" />
+        {[0, 45, 90, 135].map((a) => (
+          <rect key={a} x="14.6" y="4" width="2.8" height="26" rx="1.4" transform={`rotate(${a} 16 17)`} />
+        ))}
+      </g>
+    </svg>
+  )
+}
 
 export function MinesTool() {
-  const [levelId, setLevelId] = usePersistent<MineLevel['id']>('mayin:seviye', 'kolay', isLevel)
-  const level = levelOf(levelId)
-  const [game, setGame] = useState<Game>(() => newGame(level))
-  const [flagMode, setFlagMode] = useState(false)
+  const [sizeP, setSizeP] = usePersistent('mayin:boyut', 4, isNum)
+  const [minesP, setMinesP] = usePersistent('mayin:sayi', 3, isNum)
+  const size = clampSize(sizeP)
+  const mines = clampMines(size, minesP)
+  const [game, setGame] = useState<Game>(() => newGame(size, mines))
   const [live, setLive] = useState('')
-  const press = useRef<{ timer: number; long: boolean } | null>(null)
   const { record } = useStore()
 
-  const restart = (l: MineLevel = level) => {
-    setGame(newGame(l))
+  const restart = (s = size, m = mines) => {
+    setGame(newGame(s, m))
     setLive('Yeni oyun başladı.')
   }
 
-  const finish = (g: Game, prev: Game) => {
-    if (g.state === prev.state || g.state === 'play') return
-    const won = g.state === 'won'
-    if (won) {
+  const tap = (i: number) => {
+    const g = game
+    if (g.state !== 'play' || g.cells[i].open) return
+    const next = reveal(g, i)
+    setGame(next)
+    if (next.state === 'play') {
+      sfx.tap()
+      haptic(8)
+      return
+    }
+    const opened = g.cells.filter((c) => c.open).length
+    if (next.state === 'boom') {
+      sfx.tick()
+      haptic(45)
+      setLive('Mayın patladı. Oyun bitti.')
+      record(uid(), { tool: 'mayin', title: 'Mayın patladı', detail: `${size}×${size}, ${mines} mayın · ${opened} güvenli kare açıldı` })
+    } else {
       sfx.win()
       haptic(30)
-    } else {
-      sfx.tick()
-      haptic(40)
-    }
-    setLive(won ? 'Tarlayı temizledin, kazandın.' : 'Mayına bastın, kaybettin.')
-    record(uid(), { tool: 'mayin', title: won ? 'Mayın tarlası: kazandın' : 'Mayın tarlası: kaybettin', detail: `${level.name} · ${level.cols}×${level.rows}, ${level.mines} mayın` })
-  }
-
-  const apply = (next: (g: Game) => Game) => {
-    setGame((g) => {
-      const n = next(g)
-      if (n !== g) finish(n, g)
-      return n
-    })
-  }
-
-  const dig = (i: number) => apply((g) => reveal(g, i))
-  const flag = (i: number) => {
-    sfx.tap()
-    haptic(10)
-    apply((g) => toggleFlag(g, i))
-  }
-
-  // Kısa dokunuş: aç (ya da bayrak modunda bayrak); basılı tutma: bayrak.
-  const down = (i: number) => {
-    const p = { long: false, timer: 0 }
-    p.timer = window.setTimeout(() => {
-      p.long = true
-      flag(i)
-    }, LONG_PRESS)
-    press.current = p
-  }
-  const up = (i: number) => {
-    const p = press.current
-    if (!p) return
-    window.clearTimeout(p.timer)
-    press.current = null
-    if (p.long) return
-    if (flagMode) flag(i)
-    else {
-      sfx.tap()
-      dig(i)
+      setLive('Tüm güvenli kareler açıldı; mayın patlamadı.')
+      record(uid(), { tool: 'mayin', title: 'Mayın patlamadı', detail: `${size}×${size}, ${mines} mayın · tüm güvenli kareler açıldı` })
     }
   }
-  const cancel = () => {
-    if (press.current) window.clearTimeout(press.current.timer)
-    press.current = null
+
+  const changeSize = (s: number) => {
+    const sz = clampSize(s)
+    const m = clampMines(sz, mines)
+    setSizeP(sz)
+    setMinesP(m)
+    restart(sz, m)
+  }
+  const changeMines = (n: number) => {
+    const m = clampMines(size, n)
+    setMinesP(m)
+    restart(size, m)
   }
 
   const over = game.state !== 'play'
-  const status = game.state === 'won' ? 'Kazandın!' : game.state === 'lost' ? 'Mayına bastın' : `${flagsLeft(game)} bayrak kaldı`
+  const left = safeLeft(game)
+  const status = game.state === 'boom' ? 'Mayın patladı!' : game.state === 'clear' ? 'Hiç mayın patlamadı' : `${mines} mayın · ${left} güvenli kare`
 
   const stage = (
     <>
       <div className="stage-body mines-stage">
-        <p className={`mines__status${over ? ' is-over' : ''}`} aria-hidden="true">
+        <p className={`mines__status${over ? ' is-over' : ''}${game.state === 'boom' ? ' is-boom' : ''}`} aria-hidden="true">
           {status}
         </p>
-        <div
-          className="mines"
-          role="grid"
-          aria-label="Mayın tarlası"
-          style={{ '--cols': game.cols, '--rows': game.rows } as CSSProperties}
-          onContextMenu={(e) => e.preventDefault()}
-        >
-          {game.cells.map((c, i) => {
-            const cls = ['mcell']
-            if (c.open) cls.push('is-open')
-            if (c.open && c.mine) cls.push('is-mine')
-            if (game.boom === i) cls.push('is-boom')
-            const label = c.open ? (c.mine ? 'Mayın' : c.n ? `${c.n} mayın çevrede` : 'Boş') : c.flag ? 'Bayraklı' : 'Kapalı'
-            return (
-              <button
-                key={i}
-                type="button"
-                role="gridcell"
-                className={cls.join(' ')}
-                aria-label={`${Math.floor(i / game.cols) + 1}. satır, ${(i % game.cols) + 1}. sütun: ${label}`}
-                disabled={over}
-                data-n={c.open && !c.mine && c.n ? c.n : undefined}
-                onPointerDown={() => down(i)}
-                onPointerUp={() => up(i)}
-                onPointerLeave={cancel}
-                onPointerCancel={cancel}
-                onKeyDown={(e) => {
-                  if (e.key === 'f' || e.key === 'F') flag(i)
-                }}
-                onClick={(e) => {
-                  // Klavye (Enter/Boşluk) tıklaması: işaretçi olayları yoksa burada işlenir.
-                  if (e.detail === 0) {
-                    if (flagMode) flag(i)
-                    else dig(i)
-                  }
-                }}
-              >
-                {c.open ? (c.mine ? <Icon name="close" size={14} /> : c.n || '') : c.flag ? <Icon name="flag" size={14} /> : ''}
-              </button>
-            )
-          })}
+        <div className="mines" role="grid" aria-label="Mayın tarlası" style={{ '--cols': game.size, '--rows': game.size } as CSSProperties}>
+          {game.cells.map((c, i) => (
+            <button
+              key={i}
+              type="button"
+              role="gridcell"
+              className={`mcell${c.open ? ' is-open' : ''}${c.open && c.mine ? ' is-mine' : ''}${game.boom === i ? ' is-boom' : ''}`}
+              aria-label={`${Math.floor(i / game.size) + 1}. satır, ${(i % game.size) + 1}. sütun: ${c.open ? (c.mine ? 'mayın' : 'güvenli') : 'kapalı'}`}
+              disabled={over || c.open}
+              onClick={() => tap(i)}
+            >
+              {c.open ? c.mine ? <MineIcon size={28} /> : <Icon name="check" size={24} /> : null}
+            </button>
+          ))}
         </div>
         <p className="stage-hint" aria-hidden="true">
-          {over ? 'Yeni oyun için alttaki düğmeye bas' : 'Dokun: aç · Basılı tut: bayrak'}
+          {over ? 'Yeni oyun için alttaki düğmeye bas' : 'Bir kareye dokun'}
         </p>
       </div>
       <StageBar
-        left={<RoundButton icon="flag" label={flagMode ? 'Bayrak modu: açık' : 'Bayrak modu: kapalı'} on={flagMode} disabled={over} onClick={() => setFlagMode((v) => !v)} />}
-        right={
+        left={
           <RoundButton
-            label={`Seviye: ${level.name}. Değiştirmek için dokun.`}
-            disabled={false}
-            onClick={() => {
-              const next = LEVELS[(LEVELS.indexOf(level) + 1) % LEVELS.length]
-              setLevelId(next.id)
-              restart(next)
-            }}
+            pill
+            label={`Tarla boyutu: ${size}×${size}. Değiştirmek için dokun.`}
+            onClick={() => changeSize(size >= MAX_SIZE ? MIN_SIZE : size + 1)}
           >
-            {level.name[0]}
+            {size}×{size}
           </RoundButton>
         }
+        right={<Stepper value={mines} min={1} max={maxMines(size)} onChange={changeMines} label="Mayın sayısı" format={(n) => `${n} mayın`} />}
       />
     </>
   )
@@ -170,30 +134,18 @@ export function MinesTool() {
       live={live}
       settings={
         <>
-          <Row label="Seviye" hint="Sağ alttaki harf düğmesinin işi. Değişince oyun yeniden başlar.">
-            <Segmented
-              label="Seviye"
-              value={levelId}
-              options={LEVELS.map((l) => ({ value: l.id, label: l.name }))}
-              onChange={(v) => {
-                setLevelId(v)
-                restart(levelOf(v))
-              }}
-            />
+          <Row label="Tarla boyutu" hint="Sol alttaki boyut düğmesinin işi. Değişince oyun yeniden başlar.">
+            <Segmented label="Tarla boyutu" value={String(size)} options={SIZES.map((s) => ({ value: String(s), label: `${s}×${s}` }))} onChange={(v) => changeSize(Number(v))} />
           </Row>
-          <Row label="Bayrak modu" hint="Sol alttaki bayrak düğmesinin işi: açıkken dokunmak bayrak koyar.">
-            <Button variant="secondary" icon="flag" onClick={() => setFlagMode((v) => !v)}>
-              {flagMode ? 'Kapat' : 'Aç'}
-            </Button>
+          <Row label="Mayın sayısı" hint="Sağ alttaki − ve + düğmelerinin işi. En fazla bir kare güvenli kalır.">
+            <Stepper value={mines} min={1} max={maxMines(size)} onChange={changeMines} label="Mayın sayısı" format={(n) => `${n} mayın`} />
           </Row>
         </>
       }
       rules={[
-        'Amaç, mayın olmayan tüm kareleri açmaktır; mayına basarsan oyun biter.',
-        'Sayı, o karenin çevresindeki (çapraz dahil) mayın sayısını gösterir.',
-        'İlk dokunuş ve çevresi hiçbir zaman mayın olmaz; mayınlar ilk dokunuştan sonra rastgele yerleştirilir.',
-        'Bir kareyi açmak için dokun; bayrak koymak için basılı tut ya da sol alttaki bayrak düğmesini aç.',
-        'Sağ alttaki harf düğmesi seviyeyi değiştirir: Kolay 8×8 / 10 mayın, Orta 8×10 / 16, Zor 8×12 / 26.',
+        'Tarla 2×2’den 6×6’ya kadar kare bir ızgaradır; kaç mayın olacağını sen seçersin.',
+        'Mayınlar oyun başında rastgele yerleştirilir ve hangi karede olduğu hiçbir ipucuyla anlaşılamaz.',
+        'Mayına basılırsa tüm mayınlar görünür ve oyun biter. Tüm güvenli kareler açılırsa mayın patlamamış olur.',
       ]}
     />
   )

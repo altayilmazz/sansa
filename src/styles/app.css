@@ -1802,28 +1802,29 @@ textarea.field {
 
 /* Mayın tarlası */
 .mines-stage {
-  gap: 8px;
+  gap: 10px;
 }
 .mines__status {
-  font-size: var(--fs-sub);
+  font-size: var(--fs-callout);
   font-weight: 600;
   color: var(--ink-2);
 }
 .mines__status.is-over {
   color: var(--ink);
 }
+.mines__status.is-boom {
+  color: var(--danger);
+}
 .mines {
-  --gap: 3px;
+  --gap: 8px;
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);
   gap: var(--gap);
-  width: min(100%, calc((100dvh - 360px) * var(--cols) / var(--rows)));
-  min-width: 200px;
-  aspect-ratio: var(--cols) / var(--rows);
+  width: min(100%, calc(var(--cols) * 92px), calc(100dvh - 380px));
+  aspect-ratio: 1;
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
-  -webkit-touch-callout: none;
 }
 .mcell {
   display: grid;
@@ -1831,26 +1832,21 @@ textarea.field {
   min-width: 0;
   padding: 0;
   border: 0;
-  border-radius: 7px;
+  border-radius: 14px;
   background: var(--surface-3);
   color: var(--ink);
-  font-size: clamp(12px, 4.2vw, 18px);
-  font-weight: 800;
-  line-height: 1;
-  transition: background-color 0.12s, transform 0.12s;
+  transition: background-color 0.15s, transform 0.12s;
 }
 .mcell:not(:disabled):active {
-  transform: scale(0.92);
+  transform: scale(0.93);
 }
 .mcell.is-open {
   background: var(--surface-2);
   box-shadow: inset 0 0 0 1px var(--hairline);
+  color: var(--ok);
 }
 .mcell:disabled {
   opacity: 1;
-}
-.mcell:not(.is-open) svg {
-  color: var(--danger);
 }
 .mcell.is-mine {
   background: var(--danger-soft);
@@ -1859,17 +1855,6 @@ textarea.field {
 .mcell.is-boom {
   background: var(--danger);
   color: #fff;
-}
-.mcell[data-n='1'] { color: #4c8dff; }
-.mcell[data-n='2'] { color: #34c759; }
-.mcell[data-n='3'] { color: #ff5f57; }
-.mcell[data-n='4'] { color: #8e6bff; }
-.mcell[data-n='5'] { color: #ff9f0a; }
-.mcell[data-n='6'] { color: #30c7c7; }
-.mcell[data-n='7'] { color: var(--ink); }
-.mcell[data-n='8'] { color: var(--ink-2); }
-:root[data-theme='dark'] .mcell[data-n] {
-  color: var(--ink);
 }
 
 /* Rastgele sayı */

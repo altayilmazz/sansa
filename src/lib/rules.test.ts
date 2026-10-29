@@ -7,7 +7,7 @@ import { checkDraw, drawWinners, nextPool } from './rules/draw'
 import { addRound, matchWinner } from './rules/match'
 import { coinOutcome } from './rules/coin'
 import { diceOutcome, rollDice } from './rules/dice'
-import { flagsLeft, neighbors, newGame, reveal, toggleFlag } from './rules/mines'
+import { clampMines, maxMines, newGame, reveal, safeLeft } from './rules/mines'
 import { checkRange, generate } from './rules/number'
 import { cardOutcome, Deck, fullDeck, type Card } from './rules/cards'
 
@@ -263,36 +263,39 @@ describe('kart destesi', () => {
 })
 
 describe('mayın tarlası', () => {
-  const lvl = { rows: 8, cols: 8, mines: 10 }
-  it('ilk dokunuş ve çevresi mayınsızdır, mayın sayısı doğrudur', () => {
-    for (let k = 0; k < 30; k++) {
-      const first = 27
-      const g = reveal(newGame(lvl), first)
-      expect(g.state).toBe('play')
-      expect(g.cells.filter((c) => c.mine).length).toBe(10)
-      expect(g.cells[first].mine).toBe(false)
-      neighbors(g, first).forEach((j) => expect(g.cells[j].mine).toBe(false))
+  it('mayın sayısı tam olarak istenen kadardır ve her boyutta en az bir güvenli kare kalır', () => {
+    for (let size = 2; size <= 6; size++) {
+      const g = newGame(size, 3)
+      expect(g.cells.length).toBe(size * size)
+      expect(g.cells.filter((c) => c.mine).length).toBe(Math.min(3, maxMines(size)))
     }
+    expect(clampMines(2, 99)).toBe(3)
+    expect(clampMines(3, 0)).toBe(1)
   })
-  it('komşu sayıları mayınlarla tutarlıdır', () => {
-    const g = reveal(newGame(lvl), 0)
-    g.cells.forEach((c, i) => expect(c.n).toBe(neighbors(g, i).filter((j) => g.cells[j].mine).length))
+  it('mayınlar tüm karelere eşit dağılır', () => {
+    const hits = new Array(9).fill(0)
+    for (let k = 0; k < 900; k++) newGame(3, 1).cells.forEach((c, i) => c.mine && hits[i]++)
+    hits.forEach((h) => {
+      expect(h).toBeGreaterThan(50)
+      expect(h).toBeLessThan(160)
+    })
   })
-  it('mayına basmak kaybettirir, tüm güvenli hücreleri açmak kazandırır', () => {
-    let g = reveal(newGame(lvl), 0)
+  it('mayına basmak oyunu bitirir ve mayınları gösterir', () => {
+    const g = newGame(3, 2)
     const mine = g.cells.findIndex((c) => c.mine)
-    expect(reveal(g, mine).state).toBe('lost')
+    const end = reveal(g, mine)
+    expect(end.state).toBe('boom')
+    expect(end.boom).toBe(mine)
+    expect(end.cells.filter((c) => c.mine).every((c) => c.open)).toBe(true)
+    expect(reveal(end, 0)).toBe(end)
+  })
+  it('tüm güvenli kareler açılınca oyun temiz biter', () => {
+    let g = newGame(3, 2)
     g.cells.forEach((c, i) => {
       if (!c.mine && g.state === 'play') g = reveal(g, i)
     })
-    expect(g.state).toBe('won')
-  })
-  it('bayrak açık hücreye konmaz ve sayılır', () => {
-    let g = newGame(lvl)
-    g = toggleFlag(g, 5)
-    expect(flagsLeft(g)).toBe(9)
-    g = toggleFlag(g, 5)
-    expect(flagsLeft(g)).toBe(10)
+    expect(g.state).toBe('clear')
+    expect(safeLeft(g)).toBe(0)
   })
 })
 
